@@ -32,19 +32,12 @@ class EntriesController extends AdminController
 
         $builder
             ->setModel($stream->getEntryModel())
-            ->setOption('sortable', $stream->isSortable())
-            ->setOption('limit', $stream->isSortable() ? 9999 : null)
+            ->setColumns($stream->getAssignmentFieldSlugs())
             ->setButtons(
                 [
                     'edit' => [
                         'href' => 'admin/streams/entries/{request.route.parameters.stream}/edit/{entry.id}'
                     ]
-                ]
-            )
-            ->setColumns(
-                [
-                    'entry.cover.preview',
-                    'entry.images.count'
                 ]
             )
             ->setActions(
