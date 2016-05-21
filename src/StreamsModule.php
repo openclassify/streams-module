@@ -31,8 +31,15 @@ class StreamsModule extends Module
             ]
         ],
         'entries' => [
-            'buttons' => [
-                'new_entries'
+            'slug'        => 'entries',
+            'data-toggle' => 'modal',
+            'data-target' => '#modal',
+            'data-href'   => 'admin/streams/entries/{request.route.parameters.stream}',
+            'href'        => 'admin/streams/entries/choose',
+            'buttons'     => [
+                'new_entry' => [
+                    'href' => 'admin/streams/entries/{request.route.parameters.stream}/create'
+                ]
             ]
         ],
         'fields'  => [

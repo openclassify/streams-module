@@ -26,7 +26,7 @@ class StreamsController extends AdminController
         $builder
             ->setActions(['prompt'])
             ->setNamespace('streams')
-            ->setButtons(['edit', 'assignments']);
+            ->setButtons(['entries', 'edit', 'assignments']);
 
         return $builder->render();
     }
