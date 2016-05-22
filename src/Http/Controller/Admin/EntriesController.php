@@ -32,7 +32,7 @@ class EntriesController extends AdminController
 
         $builder
             ->setModel($stream->getEntryModel())
-            ->setColumns($stream->getAssignmentFieldSlugs())
+            ->setColumns($stream->getConfig('table.columns'))
             ->setButtons(
                 [
                     'edit' => [
