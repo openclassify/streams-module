@@ -19,8 +19,8 @@ class EntriesController extends AdminController
     /**
      * Return an index of existing entries.
      *
-     * @param  StreamRepositoryInterface                  $streams
-     * @param  TableBuilder                               $builder
+     * @param  StreamRepositoryInterface $streams
+     * @param  TableBuilder $builder
      * @param                                             $stream
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -34,17 +34,23 @@ class EntriesController extends AdminController
             ->setColumns($stream->getConfig('table.columns'))
             ->setOptions($stream->getConfig('table.options', []))
             ->setButtons(
-                [
-                    'edit' => [
-                        'href' => 'admin/streams/entries/{request.route.parameters.stream}/edit/{entry.id}',
-                    ],
-                ]
+                $stream->getConfig(
+                    'table.buttons',
+                    [
+                        'edit' => [
+                            'href' => 'admin/streams/entries/{request.route.parameters.stream}/edit/{entry.id}',
+                        ],
+                    ]
+                )
             )
             ->setActions(
-                [
-                    'delete',
-                    'edit',
-                ]
+                $stream->getConfig(
+                    'table.actions',
+                    [
+                        'delete',
+                        'edit',
+                    ]
+                )
             );
 
         return $builder->render();
@@ -69,8 +75,8 @@ class EntriesController extends AdminController
     /**
      * Create a new entry.
      *
-     * @param  StreamRepositoryInterface                  $streams
-     * @param  FormBuilder                                $builder
+     * @param  StreamRepositoryInterface $streams
+     * @param  FormBuilder $builder
      * @param                                             $stream
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -87,8 +93,8 @@ class EntriesController extends AdminController
     /**
      * Edit an existing entry.
      *
-     * @param  StreamRepositoryInterface                  $streams
-     * @param  FormBuilder                                $builder
+     * @param  StreamRepositoryInterface $streams
+     * @param  FormBuilder $builder
      * @param                                             $stream
      * @param                                             $id
      * @return \Symfony\Component\HttpFoundation\Response
