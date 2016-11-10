@@ -1,4 +1,4 @@
-{% set namespace = entries('streams', 'groups').findBySlug(session_get('anomaly.module.streams::namespace')) %}
+{% set namespace = entries('streams', 'groups').findBySlug(session_get('anomaly.module.streams::namespace', 'streams')) %}
 
 {% if namespace %}
     <div class="card">
