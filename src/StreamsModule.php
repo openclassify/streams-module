@@ -52,7 +52,7 @@ class StreamsModule extends Module
                     'data-toggle' => 'modal',
                     'data-target' => '#modal',
                     'icon'        => 'fa fa-random',
-                    'href'        => 'admin/streams/namespaces/change',
+                    'href'        => 'admin/streams/namespaces/change?entries=true',
                 ],
             ],
         ],
