@@ -5,6 +5,8 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
+use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
+use Illuminate\Session\Store;
 
 /**
  * Class EntriesController
@@ -17,10 +19,31 @@ class EntriesController extends AdminController
 {
 
     /**
+     * The working namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
+     * Create a new StreamsController instance.
+     *
+     * @param Store $session
+     */
+    public function __construct(Store $session)
+    {
+        $this->namespace = $session->get('anomaly.module.streams::namespace', 'streams');
+
+        $this->middleware(SetCheckNamespace::class);
+
+        parent::__construct();
+    }
+
+    /**
      * Return an index of existing entries.
      *
-     * @param  StreamRepositoryInterface $streams
-     * @param  TableBuilder $builder
+     * @param  StreamRepositoryInterface                  $streams
+     * @param  TableBuilder                               $builder
      * @param                                             $stream
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -33,6 +56,7 @@ class EntriesController extends AdminController
             ->setModel($stream->getEntryModel())
             ->setColumns($stream->getConfig('table.columns'))
             ->setOptions($stream->getConfig('table.options', []))
+            ->setOption('heading', 'module::admin/groups/heading')
             ->setButtons(
                 $stream->getConfig(
                     'table.buttons',
@@ -64,10 +88,20 @@ class EntriesController extends AdminController
      */
     public function choose(StreamRepositoryInterface $streams)
     {
-        return view(
-            'module::ajax/choose_stream',
+        $streams = $streams->findAllByNamespace($this->getNamespace());
+
+        if ($this->getNamespace() == 'streams') {
+            $streams = $streams->filter(
+                function (StreamInterface $stream) {
+                    return !in_array($stream->getSlug(), ['groups']);
+                }
+            );
+        }
+
+        return $this->view->make(
+            'module::admin/entries/choose',
             [
-                'streams' => $streams->findAllByNamespace('streams'),
+                'streams' => $streams,
             ]
         );
     }
@@ -75,8 +109,8 @@ class EntriesController extends AdminController
     /**
      * Create a new entry.
      *
-     * @param  StreamRepositoryInterface $streams
-     * @param  FormBuilder $builder
+     * @param  StreamRepositoryInterface                  $streams
+     * @param  FormBuilder                                $builder
      * @param                                             $stream
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -85,6 +119,7 @@ class EntriesController extends AdminController
         /* @var StreamInterface $stream */
         $stream = $streams->find($stream);
 
+        $builder->setOption('heading', 'module::admin/groups/heading');
         $builder->setModel($stream->getEntryModel());
 
         return $builder->render();
@@ -93,8 +128,8 @@ class EntriesController extends AdminController
     /**
      * Edit an existing entry.
      *
-     * @param  StreamRepositoryInterface $streams
-     * @param  FormBuilder $builder
+     * @param  StreamRepositoryInterface                  $streams
+     * @param  FormBuilder                                $builder
      * @param                                             $stream
      * @param                                             $id
      * @return \Symfony\Component\HttpFoundation\Response
@@ -104,8 +139,19 @@ class EntriesController extends AdminController
         /* @var StreamInterface $stream */
         $stream = $streams->find($stream);
 
+        $builder->setOption('heading', 'module::admin/groups/heading');
         $builder->setModel($stream->getEntryModel());
 
         return $builder->render($id);
+    }
+
+    /**
+     * Get the namespace.
+     *
+     * @return string
+     */
+    protected function getNamespace()
+    {
+        return $this->namespace;
     }
 }

@@ -33,6 +33,28 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
         'admin/streams/fields'                         => 'Anomaly\StreamsModule\Http\Controller\Admin\FieldsController@index',
         'admin/streams/fields/choose'                  => 'Anomaly\StreamsModule\Http\Controller\Admin\FieldsController@choose',
         'admin/streams/fields/create'                  => 'Anomaly\StreamsModule\Http\Controller\Admin\FieldsController@create',
-        'admin/streams/fields/edit/{id}'               => 'Anomaly\StreamsModule\Http\Controller\Admin\FieldsController@edit'
+        'admin/streams/fields/edit/{id}'               => 'Anomaly\StreamsModule\Http\Controller\Admin\FieldsController@edit',
+        'admin/streams/namespaces'                     => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@index',
+        'admin/streams/namespaces/create'              => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@create',
+        'admin/streams/namespaces/change'              => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@change',
+        'admin/streams/namespaces/edit/{id}'           => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@edit',
+    ];
+
+    /**
+     * The addon bindings.
+     *
+     * @var array
+     */
+    protected $bindings = [
+        'Anomaly\Streams\Platform\Model\Streams\StreamsGroupsEntryModel' => 'Anomaly\StreamsModule\Group\GroupModel',
+    ];
+
+    /**
+     * The addon singletons.
+     *
+     * @var array
+     */
+    protected $singletons = [
+        'Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface' => 'Anomaly\StreamsModule\Group\GroupRepository',
     ];
 }

@@ -6,6 +6,9 @@ use Anomaly\Streams\Platform\Field\Contract\FieldRepositoryInterface;
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
+use Anomaly\StreamsModule\Http\Middleware\AuthorizeNamespace;
+use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
+use Illuminate\Session\Store;
 
 /**
  * Class AssignmentsController
@@ -19,6 +22,28 @@ class AssignmentsController extends AdminController
 {
 
     /**
+     * The working namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
+     * Create a new StreamsController instance.
+     *
+     * @param Store $session
+     */
+    public function __construct(Store $session)
+    {
+        $this->namespace = $session->get('anomaly.module.streams::namespace', 'streams');
+
+        $this->middleware(SetCheckNamespace::class);
+        $this->middleware(AuthorizeNamespace::class);
+
+        parent::__construct();
+    }
+
+    /**
      * Return an index of existing assignments.
      *
      * @param AssignmentTableBuilder    $table
@@ -28,7 +53,10 @@ class AssignmentsController extends AdminController
      */
     public function index(AssignmentTableBuilder $table, StreamRepositoryInterface $streams, $stream)
     {
-        return $table->setStream($streams->find($stream))->render();
+        return $table
+            ->setStream($streams->find($stream))
+            ->setOption('heading', 'module::admin/groups/heading')
+            ->render();
     }
 
     /**
@@ -46,7 +74,7 @@ class AssignmentsController extends AdminController
             ->notAssignedTo($streams->find($stream))
             ->unlocked();
 
-        return $this->view->make('module::ajax/choose_field', compact('fields', 'stream'));
+        return $this->view->make('module::admin/assignments/choose', compact('fields', 'stream'));
     }
 
     /**
@@ -66,11 +94,13 @@ class AssignmentsController extends AdminController
     ) {
         $stream = $streams->find($stream);
 
-        return $builder
+        $builder
             ->setOption('redirect', 'admin/streams/assignments/' . $stream->getId())
             ->setField($fields->find($this->request->get('field')))
-            ->setStream($stream)
-            ->render();
+            ->setOption('heading', 'module::admin/groups/heading')
+            ->setStream($stream);
+
+        return $builder->render();
     }
 
     /**
@@ -91,9 +121,21 @@ class AssignmentsController extends AdminController
         /* @var StreamInterface $stream */
         $stream = $streams->find($stream);
 
-        return $builder
+        $builder
             ->setOption('redirect', 'admin/streams/assignments/' . $stream->getId())
-            ->setStream($stream)
-            ->render($id);
+            ->setOption('heading', 'module::admin/groups/heading')
+            ->setStream($stream);
+
+        return $builder->render($id);
+    }
+
+    /**
+     * Get the namespace.
+     *
+     * @return string
+     */
+    protected function getNamespace()
+    {
+        return $this->namespace;
     }
 }

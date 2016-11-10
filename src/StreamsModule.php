@@ -19,38 +19,63 @@ class StreamsModule extends Module
      * @var array
      */
     protected $sections = [
-        'streams' => [
+        'streams'    => [
             'buttons' => [
                 'new_stream',
-                'assign_fields' => [
+                'assign_fields'    => [
                     'data-toggle' => 'modal',
                     'data-target' => '#modal',
                     'enabled'     => 'admin/streams/assignments/*',
-                    'href'        => 'admin/streams/assignments/{request.route.parameters.stream}/choose'
-                ]
-            ]
+                    'href'        => 'admin/streams/assignments/{request.route.parameters.stream}/choose',
+                ],
+                'change_namespace' => [
+                    'type'        => 'info',
+                    'data-toggle' => 'modal',
+                    'data-target' => '#modal',
+                    'icon'        => 'fa fa-random',
+                    'href'        => 'admin/streams/namespaces/change',
+                ],
+            ],
         ],
-        'entries' => [
+        'entries'    => [
             'slug'        => 'entries',
             'data-toggle' => 'modal',
             'data-target' => '#modal',
             'data-href'   => 'admin/streams/entries/{request.route.parameters.stream}',
             'href'        => 'admin/streams/entries/choose',
             'buttons'     => [
-                'new_entry' => [
-                    'href' => 'admin/streams/entries/{request.route.parameters.stream}/create'
-                ]
-            ]
-        ],
-        'fields'  => [
-            'buttons' => [
-                'new_field' => [
+                'new_entry'        => [
+                    'href' => 'admin/streams/entries/{request.route.parameters.stream}/create',
+                ],
+                'change_namespace' => [
+                    'type'        => 'info',
                     'data-toggle' => 'modal',
                     'data-target' => '#modal',
-                    'href'        => 'admin/streams/fields/choose'
-                ]
-            ]
-        ]
+                    'icon'        => 'fa fa-random',
+                    'href'        => 'admin/streams/namespaces/change',
+                ],
+            ],
+        ],
+        'fields'     => [
+            'buttons' => [
+                'new_field'        => [
+                    'data-toggle' => 'modal',
+                    'data-target' => '#modal',
+                    'href'        => 'admin/streams/fields/choose',
+                ],
+                'change_namespace' => [
+                    'type'        => 'info',
+                    'data-toggle' => 'modal',
+                    'data-target' => '#modal',
+                    'icon'        => 'fa fa-random',
+                    'href'        => 'admin/streams/namespaces/change',
+                ],
+            ],
+        ],
+        'namespaces' => [
+            'buttons' => [
+                'new_namespace',
+            ],
+        ],
     ];
-
 }

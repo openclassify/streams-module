@@ -4,6 +4,9 @@ use Anomaly\Streams\Platform\Addon\FieldType\FieldTypeCollection;
 use Anomaly\Streams\Platform\Field\Form\FieldFormBuilder;
 use Anomaly\Streams\Platform\Field\Table\FieldTableBuilder;
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
+use Anomaly\StreamsModule\Http\Middleware\AuthorizeNamespace;
+use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
+use Illuminate\Session\Store;
 
 /**
  * Class FieldsController
@@ -17,6 +20,28 @@ class FieldsController extends AdminController
 {
 
     /**
+     * The working namespace.
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
+     * Create a new StreamsController instance.
+     *
+     * @param Store $session
+     */
+    public function __construct(Store $session)
+    {
+        $this->namespace = $session->get('anomaly.module.streams::namespace', 'streams');
+
+        $this->middleware(SetCheckNamespace::class);
+        $this->middleware(AuthorizeNamespace::class);
+
+        parent::__construct();
+    }
+
+    /**
      * Return an index of existing fields.
      *
      * @param FieldTableBuilder $table
@@ -24,7 +49,9 @@ class FieldsController extends AdminController
      */
     public function index(FieldTableBuilder $table)
     {
-        $table->setNamespace('streams');
+        $table
+            ->setOption('heading', 'module::admin/groups/heading')
+            ->setNamespace($this->getNamespace());
 
         return $table->render();
     }
@@ -37,7 +64,7 @@ class FieldsController extends AdminController
      */
     public function choose(FieldTypeCollection $fieldTypes)
     {
-        return $this->view->make('module::ajax/choose_field_type', ['field_types' => $fieldTypes]);
+        return $this->view->make('module::admin/fields/choose', ['field_types' => $fieldTypes]);
     }
 
     /**
@@ -50,8 +77,9 @@ class FieldsController extends AdminController
     public function create(FieldFormBuilder $form, FieldTypeCollection $fieldTypes)
     {
         $form
-            ->setNamespace('streams')
-            ->setFieldType($fieldTypes->get($_GET['field_type']));
+            ->setNamespace($this->getNamespace())
+            ->setOption('heading', 'module::admin/groups/heading')
+            ->setFieldType($fieldTypes->get($this->request->get('field_type')));
 
         return $form->render();
     }
@@ -65,6 +93,18 @@ class FieldsController extends AdminController
      */
     public function edit(FieldFormBuilder $form, $id)
     {
-        return $form->render($id);
+        return $form
+            ->setOption('heading', 'module::admin/groups/heading')
+            ->render($id);
+    }
+
+    /**
+     * Get the namespace.
+     *
+     * @return string
+     */
+    protected function getNamespace()
+    {
+        return $this->namespace;
     }
 }
