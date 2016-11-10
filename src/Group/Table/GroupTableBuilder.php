@@ -38,7 +38,6 @@ class GroupTableBuilder extends TableBuilder
             'wrapper' => '<code>{value}</code>',
         ],
         'description',
-        'entry.allowed_roles.labels|join(" ")',
     ];
 
     /**
