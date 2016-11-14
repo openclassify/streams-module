@@ -55,19 +55,4 @@ class GroupTableBuilder extends TableBuilder
     protected $actions = [
         'delete',
     ];
-
-    /**
-     * The table options.
-     *
-     * @var array
-     */
-    protected $options = [];
-
-    /**
-     * The table assets.
-     *
-     * @var array
-     */
-    protected $assets = [];
-
 }
