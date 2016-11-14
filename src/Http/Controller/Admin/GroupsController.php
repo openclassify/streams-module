@@ -4,6 +4,8 @@ use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\StreamsModule\Group\Form\GroupFormBuilder;
 use Anomaly\StreamsModule\Group\Table\GroupTableBuilder;
+use Anomaly\StreamsModule\Http\Middleware\AuthorizeNamespace;
+use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
 
 /**
  * Class GroupsController
@@ -14,6 +16,17 @@ use Anomaly\StreamsModule\Group\Table\GroupTableBuilder;
  */
 class GroupsController extends AdminController
 {
+
+    /**
+     * Create a new StreamsController instance.
+     */
+    public function __construct()
+    {
+        $this->middleware(SetCheckNamespace::class);
+        $this->middleware(AuthorizeNamespace::class);
+
+        parent::__construct();
+    }
 
     /**
      * Display an index of existing entries.

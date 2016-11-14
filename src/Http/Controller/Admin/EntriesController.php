@@ -3,8 +3,8 @@
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
-use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
-use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
+use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
+use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
 use Illuminate\Session\Store;
 
@@ -42,40 +42,15 @@ class EntriesController extends AdminController
     /**
      * Return an index of existing entries.
      *
-     * @param  StreamRepositoryInterface                  $streams
-     * @param  TableBuilder                               $builder
-     * @param                                             $stream
+     * @param  StreamRepositoryInterface $streams
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function index(StreamRepositoryInterface $streams, TableBuilder $builder, $stream)
+    public function index(StreamRepositoryInterface $streams)
     {
         /* @var StreamInterface $stream */
-        $stream = $streams->find($stream);
+        $stream = $streams->find($this->route->getParameter('stream'));
 
-        $builder
-            ->setModel($stream->getEntryModel())
-            ->setColumns($stream->getConfig('table.columns'))
-            ->setOptions($stream->getConfig('table.options', []))
-            ->setOption('heading', 'module::admin/groups/heading')
-            ->setButtons(
-                $stream->getConfig(
-                    'table.buttons',
-                    [
-                        'edit' => [
-                            'href' => 'admin/streams/entries/{request.route.parameters.stream}/edit/{entry.id}',
-                        ],
-                    ]
-                )
-            )
-            ->setActions(
-                $stream->getConfig(
-                    'table.actions',
-                    [
-                        'delete',
-                        'edit',
-                    ]
-                )
-            );
+        $builder = $this->dispatch(new GetEntryTableBuilder($stream));
 
         return $builder->render();
     }
@@ -109,18 +84,15 @@ class EntriesController extends AdminController
     /**
      * Create a new entry.
      *
-     * @param  StreamRepositoryInterface                  $streams
-     * @param  FormBuilder                                $builder
-     * @param                                             $stream
+     * @param  StreamRepositoryInterface $streams
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function create(StreamRepositoryInterface $streams, FormBuilder $builder, $stream)
+    public function create(StreamRepositoryInterface $streams)
     {
         /* @var StreamInterface $stream */
-        $stream = $streams->find($stream);
+        $stream = $streams->find($this->route->getParameter('stream'));
 
-        $builder->setOption('heading', 'module::admin/groups/heading');
-        $builder->setModel($stream->getEntryModel());
+        $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
         return $builder->render();
     }
@@ -128,21 +100,17 @@ class EntriesController extends AdminController
     /**
      * Edit an existing entry.
      *
-     * @param  StreamRepositoryInterface                  $streams
-     * @param  FormBuilder                                $builder
-     * @param                                             $stream
-     * @param                                             $id
+     * @param  StreamRepositoryInterface $streams
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function edit(StreamRepositoryInterface $streams, FormBuilder $builder, $stream, $id)
+    public function edit(StreamRepositoryInterface $streams)
     {
         /* @var StreamInterface $stream */
-        $stream = $streams->find($stream);
+        $stream = $streams->find($this->route->getParameter('stream'));
 
-        $builder->setOption('heading', 'module::admin/groups/heading');
-        $builder->setModel($stream->getEntryModel());
+        $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
-        return $builder->render($id);
+        return $builder->render($this->route->getParameter('id'));
     }
 
     /**

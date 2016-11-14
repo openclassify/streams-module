@@ -34,9 +34,7 @@ class GroupTableBuilder extends TableBuilder
      */
     protected $columns = [
         'name',
-        'slug' => [
-            'wrapper' => '<code>{value}</code>',
-        ],
+        'slug',
         'description',
     ];
 

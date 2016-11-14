@@ -22,12 +22,6 @@ class StreamsModule extends Module
         'streams'    => [
             'buttons' => [
                 'new_stream',
-                'assign_fields'    => [
-                    'data-toggle' => 'modal',
-                    'data-target' => '#modal',
-                    'enabled'     => 'admin/streams/assignments/*',
-                    'href'        => 'admin/streams/assignments/{request.route.parameters.stream}/choose',
-                ],
                 'change_namespace' => [
                     'type'        => 'info',
                     'data-toggle' => 'modal',
@@ -36,6 +30,18 @@ class StreamsModule extends Module
                     'href'        => 'admin/streams/namespaces/change',
                 ],
             ],
+            'sections' => [
+                'assignments' => [
+                    'buttons' => [
+                        'assign_fields'    => [
+                            'data-toggle' => 'modal',
+                            'data-target' => '#modal',
+                            'enabled'     => 'admin/streams/assignments/*',
+                            'href'        => 'admin/streams/assignments/{request.route.parameters.stream}/choose',
+                        ],
+                    ]
+                ]
+            ]
         ],
         'entries'    => [
             'slug'        => 'entries',

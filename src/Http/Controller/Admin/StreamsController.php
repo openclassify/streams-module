@@ -52,8 +52,13 @@ class StreamsController extends AdminController
             ->setActions(['prompt'])
             ->setNamespace($this->getNamespace())
             ->setOption('heading', 'module::admin/groups/heading')
-            ->setOption('heading', 'module::admin/groups/heading')
-            ->setButtons(['entries', 'edit', 'assignments']);
+            ->setButtons(
+                [
+                    'entries',
+                    'edit',
+                    'assignments',
+                ]
+            );
 
         return $builder->render();
     }
