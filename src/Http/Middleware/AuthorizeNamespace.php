@@ -91,9 +91,11 @@ class AuthorizeNamespace
         $user = $this->auth->user();
 
         /* @var GroupInterface $group */
-        $group = $this->groups->findBySlug(
-            $this->session->get('anomaly.module.streams::namespace', 'streams')
-        );
+        if ($namespace = $this->session->get('anomaly.module.streams::namespace')) {
+            $group = $this->groups->findBySlug($namespace);
+        } else {
+            $group = $this->groups->first();
+        }
 
         /**
          * If no group can be found
