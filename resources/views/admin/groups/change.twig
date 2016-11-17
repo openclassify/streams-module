@@ -1,0 +1,25 @@
+<div class="modal-header">
+    <button class="close" data-dismiss="modal">
+        <span>&times;</span>
+    </button>
+    <h4 class="modal-title">{{ trans('module::message.choose_namespace') }}</h4>
+</div>
+
+<div class="modal-body">
+    {% if not groups.isEmpty() %}
+        <ul class="nav nav-pills nav-stacked">
+            {% for group in groups %}
+                <li class="nav-item">
+                    <a href="{{ request_get('entries') ? url('admin/streams/entries/choose?namespace=' ~ group.slug) : url_previous() ~ '?namespace=' ~ group.slug }}"
+                       class="nav-link {{ request_get('entries') ? 'ajax' }}">
+                        <strong>{{ group.name }}</strong>
+                        <br>
+                        <small>{{ group.description }}</small>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {{ trans('streams::message.no_results') }}
+    {% endif %}
+</div>
