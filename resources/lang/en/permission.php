@@ -4,7 +4,7 @@ return [
     'streams' => [
         'name'   => 'Streams',
         'option' => [
-            'read' => 'Can access streams module.',
+            'access' => 'Can access streams module.',
         ],
     ],
 ];
