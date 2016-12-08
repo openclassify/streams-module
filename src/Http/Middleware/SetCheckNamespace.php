@@ -1,5 +1,7 @@
 <?php namespace Anomaly\StreamsModule\Http\Middleware;
 
+use Anomaly\StreamsModule\Group\Contract\GroupInterface;
+use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -14,6 +16,13 @@ use Illuminate\Session\Store;
  */
 class SetCheckNamespace
 {
+
+    /**
+     * The group repository.
+     *
+     * @var GroupRepositoryInterface
+     */
+    protected $groups;
 
     /**
      * The session store.
@@ -32,11 +41,13 @@ class SetCheckNamespace
     /**
      * Create a new SetCheckNamespace instance.
      *
-     * @param Store      $session
-     * @param Redirector $redirect
+     * @param Store                    $session
+     * @param Redirector               $redirect
+     * @param GroupRepositoryInterface $groups
      */
-    public function __construct(Store $session, Redirector $redirect)
+    public function __construct(Store $session, Redirector $redirect, GroupRepositoryInterface $groups)
     {
+        $this->groups   = $groups;
         $this->session  = $session;
         $this->redirect = $redirect;
     }
@@ -53,6 +64,14 @@ class SetCheckNamespace
         if ($namespace = $request->get('namespace')) {
 
             $this->session->set('anomaly.module.streams::namespace', $namespace);
+
+            return $this->redirect->to($request->path());
+        }
+
+        /* @var GroupInterface $namespace */
+        if (!$this->session->get('anomaly.module.streams::namespace') && $namespace = $this->groups->first()) {
+
+            $this->session->set('anomaly.module.streams::namespace', $namespace->getSlug());
 
             return $this->redirect->to($request->path());
         }
