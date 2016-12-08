@@ -14,13 +14,20 @@ class StreamsModule extends Module
 {
 
     /**
+     * The addon icon.
+     *
+     * @var string
+     */
+    protected $icon = 'database';
+
+    /**
      * The module sections.
      *
      * @var array
      */
     protected $sections = [
         'streams'    => [
-            'buttons' => [
+            'buttons'  => [
                 'new_stream',
                 'change_namespace' => [
                     'type'        => 'info',
@@ -33,15 +40,15 @@ class StreamsModule extends Module
             'sections' => [
                 'assignments' => [
                     'buttons' => [
-                        'assign_fields'    => [
+                        'assign_fields' => [
                             'data-toggle' => 'modal',
                             'data-target' => '#modal',
                             'enabled'     => 'admin/streams/assignments/*',
                             'href'        => 'admin/streams/assignments/{request.route.parameters.stream}/choose',
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ],
         'entries'    => [
             'slug'        => 'entries',
