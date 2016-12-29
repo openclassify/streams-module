@@ -1,5 +1,6 @@
 <?php namespace Anomaly\StreamsModule\Http\Middleware;
 
+use Anomaly\Streams\Platform\Message\MessageBag;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Closure;
@@ -39,17 +40,30 @@ class SetCheckNamespace
     protected $redirect;
 
     /**
+     * The message bag.
+     *
+     * @var MessageBag
+     */
+    protected $messages;
+
+    /**
      * Create a new SetCheckNamespace instance.
      *
+     * @param GroupRepositoryInterface $groups
      * @param Store                    $session
      * @param Redirector               $redirect
-     * @param GroupRepositoryInterface $groups
+     * @param MessageBag               $messages
      */
-    public function __construct(Store $session, Redirector $redirect, GroupRepositoryInterface $groups)
-    {
+    public function __construct(
+        GroupRepositoryInterface $groups,
+        Store $session,
+        Redirector $redirect,
+        MessageBag $messages
+    ) {
         $this->groups   = $groups;
         $this->session  = $session;
         $this->redirect = $redirect;
+        $this->messages = $messages;
     }
 
     /**
@@ -61,19 +75,57 @@ class SetCheckNamespace
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($namespace = $request->get('namespace')) {
+        /**
+         * Ignore everything this if
+         * we're creating a new group.
+         */
+        if ($request->path() == 'admin/streams/namespaces/create') {
 
-            $this->session->set('anomaly.module.streams::namespace', $namespace);
+            $this->session->set('anomaly.module.streams::namespace', null);
+
+            return $next($request);
+        }
+
+        /* @var GroupInterface $group */
+        if (!$namespace = $request->get('namespace', $this->session->get('anomaly.module.streams::namespace'))) {
+            $group = $this->groups->first();
+        } else {
+            $group = $this->groups->findBySlug($namespace);
+        }
+
+        /**
+         * If we don't have a namespace but
+         * we do have a group then update
+         * the namespace and redirect.
+         */
+        if (!$namespace && $group) {
+
+            $this->session->set('anomaly.module.streams::namespace', $group->getSlug());
 
             return $this->redirect->to($request->path());
         }
 
-        /* @var GroupInterface $namespace */
-        if (!$this->session->get('anomaly.module.streams::namespace') && $namespace = $this->groups->first()) {
+        /**
+         * If we don't have a namespace or
+         * a group then we need to create one.
+         */
+        if (!$namespace && !$group) {
 
-            $this->session->set('anomaly.module.streams::namespace', $namespace->getSlug());
+            $this->messages->info('anomaly.module.streams::message.get_started');
 
-            return $this->redirect->to($request->path());
+            return $this->redirect->to('admin/streams/namespaces/create');
+        }
+
+        /**
+         * If we have a namespace but no
+         * group then the namespace is old
+         * and we need to create a new group.
+         */
+        if ($namespace && !$group) {
+
+            $this->messages->info('anomaly.module.streams::message.get_started');
+            
+            return $this->redirect->to('admin/streams/namespaces/create');
         }
 
         return $next($request);
