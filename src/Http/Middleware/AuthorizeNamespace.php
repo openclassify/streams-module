@@ -1,13 +1,11 @@
 <?php namespace Anomaly\StreamsModule\Http\Middleware;
 
-use Anomaly\Streams\Platform\Message\MessageBag;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\UsersModule\User\Contract\UserInterface;
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
 use Illuminate\Session\Store;
 
 /**
@@ -42,40 +40,20 @@ class AuthorizeNamespace
     protected $session;
 
     /**
-     * The redirect utility.
-     *
-     * @var Redirector
-     */
-    protected $redirect;
-
-    /**
-     * The message bag.
-     *
-     * @var MessageBag
-     */
-    protected $messages;
-
-    /**
      * Create a new AuthorizeNamespace instance.
      *
      * @param Guard                    $auth
      * @param GroupRepositoryInterface $groups
      * @param Store                    $session
-     * @param Redirector               $redirect
-     * @param MessageBag               $messages
      */
     public function __construct(
         Guard $auth,
         GroupRepositoryInterface $groups,
-        Store $session,
-        Redirector $redirect,
-        MessageBag $messages
+        Store $session
     ) {
-        $this->auth     = $auth;
-        $this->groups   = $groups;
-        $this->session  = $session;
-        $this->redirect = $redirect;
-        $this->messages = $messages;
+        $this->auth    = $auth;
+        $this->groups  = $groups;
+        $this->session = $session;
     }
 
     /**
@@ -91,25 +69,14 @@ class AuthorizeNamespace
         $user = $this->auth->user();
 
         /* @var GroupInterface $group */
-        if ($namespace = $this->session->get('anomaly.module.streams::namespace')) {
-            $group = $this->groups->findBySlug($namespace);
-        } else {
-            $group = $this->groups->first();
-        }
-
-        /**
-         * If no group can be found
-         * then nothing to protect!
-         */
-        if (!$group && $request->path() != 'admin/streams/namespaces/create') {
-
-            $this->messages->info('anomaly.module.streams::message.get_started');
-
-            return $this->redirect->to('admin/streams/namespaces/create');
-        }
+        $group = $this->groups->findBySlug($namespace = $this->session->get('anomaly.module.streams::namespace'));
 
         if (!$group && $request->path() == 'admin/streams/namespaces/create') {
             return $next($request);
+        }
+
+        if (!$group) {
+            throw new \Exception("Group not found with namespace [{$namespace}]");
         }
 
         $roles = $group->getAllowedRoles();
