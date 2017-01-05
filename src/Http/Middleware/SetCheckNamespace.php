@@ -122,7 +122,7 @@ class SetCheckNamespace
          * and we need to create a new group.
          */
         if ($namespace && !$group) {
-
+dd('Test');
             $this->messages->info('anomaly.module.streams::message.get_started');
             
             return $this->redirect->to('admin/streams/namespaces/create');
