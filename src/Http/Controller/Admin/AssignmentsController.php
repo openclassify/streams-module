@@ -35,10 +35,10 @@ class AssignmentsController extends AdminController
      */
     public function __construct(Store $session)
     {
-        $this->namespace = $session->get('anomaly.module.streams::namespace', 'streams');
-
         $this->middleware(SetCheckNamespace::class);
         $this->middleware(AuthorizeNamespace::class);
+
+        $this->namespace = $session->get('anomaly.module.streams::namespace');
 
         parent::__construct();
     }
