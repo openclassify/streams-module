@@ -122,13 +122,23 @@ class SetCheckNamespace
          * and we need to create a new group.
          */
         if ($namespace && !$group) {
-dd('Test');
+
             $this->messages->info('anomaly.module.streams::message.get_started');
             
             return $this->redirect->to('admin/streams/namespaces/create');
         }
 
-        $this->session->set('anomaly.module.streams::namespace', $group->getSlug());
+        /**
+         * If we're good to go and we've got a
+         * query string param for namespace then
+         * redirect to intended so session sticks.
+         */
+        if ($namespace && $group && $request->has('namespace')) {
+
+            $this->session->set('anomaly.module.streams::namespace', $group->getSlug());
+
+            return $this->redirect->to($request->path());
+        }
 
         return $next($request);
     }
