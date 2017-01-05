@@ -128,6 +128,8 @@ class SetCheckNamespace
             return $this->redirect->to('admin/streams/namespaces/create');
         }
 
+        $this->session->set('anomaly.module.streams::namespace', $group->getSlug());
+
         return $next($request);
     }
 }
