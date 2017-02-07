@@ -65,8 +65,16 @@ class AuthorizeNamespace
      */
     public function handle(Request $request, Closure $next)
     {
-        /* @var UserInterface $user */
-        $user = $this->auth->user();
+        /**
+         * If there is no user than we're
+         * not logged in and we're gonna
+         * be booted to login anyways.
+         *
+         * @var UserInterface $user
+         */
+        if (!$user = $this->auth->user()) {
+            return $next($request);
+        }
 
         /* @var GroupInterface $group */
         $group = $this->groups->findBySlug($namespace = $this->session->get('anomaly.module.streams::namespace'));
