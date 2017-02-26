@@ -1,7 +1,7 @@
 <?php namespace Anomaly\StreamsModule\Entry\Command;
 
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
-use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
+use Anomaly\StreamsModule\Entry\Table\EntryTableBuilder;
 
 /**
  * Class GetDefaultTableBuilder
@@ -33,10 +33,10 @@ class GetDefaultTableBuilder
     /**
      * Handle the command.
      *
-     * @param TableBuilder $builder
-     * @return TableBuilder
+     * @param EntryTableBuilder $builder
+     * @return EntryTableBuilder
      */
-    public function handle(TableBuilder $builder)
+    public function handle(EntryTableBuilder $builder)
     {
         return $builder
             ->setModel($this->stream->getEntryModel())
@@ -47,19 +47,6 @@ class GetDefaultTableBuilder
                     ],
                 ]
             )
-            ->setColumns(array_slice($this->stream->getAssignmentFieldSlugs(), 0, 4))
-            ->setButtons(
-                [
-                    'edit' => [
-                        'href' => 'admin/streams/entries/{request.route.parameters.stream}/edit/{entry.id}',
-                    ],
-                ]
-            )
-            ->setActions(
-                [
-                    'delete',
-                    'edit',
-                ]
-            );
+            ->setColumns(array_slice($this->stream->getAssignmentFieldSlugs(), 0, 4));
     }
 }

@@ -51,7 +51,9 @@ class GetEntryTableBuilder
          * @var TableBuilder $builder
          */
         try {
-            $builder = $container->make("anomaly.module.streams::{$namespace}.{$stream}.table");
+            $builder = $container
+                ->make("anomaly.module.streams::{$namespace}.{$stream}.table")
+                ->setModel($this->stream->getEntryModel());
         } catch (\Exception $e) {
             if (!$builder = $this->dispatch(new GetConfiguredTableBuilder($this->stream))) {
                 $builder = $this->dispatch(new GetDefaultTableBuilder($this->stream));
