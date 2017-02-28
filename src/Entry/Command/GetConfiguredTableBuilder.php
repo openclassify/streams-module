@@ -1,9 +1,9 @@
 <?php namespace Anomaly\StreamsModule\Entry\Command;
 
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
+use Anomaly\Streams\Platform\Support\Hydrator;
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
@@ -38,10 +38,11 @@ class GetConfiguredTableBuilder
     /**
      * Handle the command.
      *
-     * @param Container $container
-     * @return TableBuilder
+     * @param Hydrator   $hydrator
+     * @param Repository $config
+     * @return TableBuilder|null
      */
-    public function handle(Container $container, Repository $config)
+    public function handle(Hydrator $hydrator, Repository $config)
     {
         $stream    = $this->stream->getSlug();
         $namespace = $this->stream->getNamespace();
@@ -50,18 +51,9 @@ class GetConfiguredTableBuilder
             return null;
         }
 
-        /**
-         * Try resolving the table builder.
-         *
-         * @var TableBuilder $builder
-         */
-        if ($builder = array_pull($parameters, 'builder')) {
-            try {
-                $builder = $container->make("anomaly.module.streams::{$namespace}.{$stream}.table");
-            } catch (\Exception $e) {
-                $builder = $this->dispatch(new GetDefaultTableBuilder($this->stream));
-            }
-        }
+        $builder = $this->dispatch(new GetDefaultTableBuilder($this->stream));
+
+        $hydrator->hydrate($builder, $parameters);
 
         return $builder;
     }

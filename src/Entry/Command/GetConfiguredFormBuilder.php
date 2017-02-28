@@ -1,9 +1,9 @@
 <?php namespace Anomaly\StreamsModule\Entry\Command;
 
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
+use Anomaly\Streams\Platform\Support\Hydrator;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
@@ -38,10 +38,11 @@ class GetConfiguredFormBuilder
     /**
      * Handle the command.
      *
-     * @param Container $container
+     * @param Hydrator   $hydrator
+     * @param Repository $config
      * @return FormBuilder
      */
-    public function handle(Container $container, Repository $config)
+    public function handle(Hydrator $hydrator, Repository $config)
     {
         $stream    = $this->stream->getSlug();
         $namespace = $this->stream->getNamespace();
@@ -50,18 +51,9 @@ class GetConfiguredFormBuilder
             return null;
         }
 
-        /**
-         * Try resolving the form builder.
-         *
-         * @var FormBuilder $builder
-         */
-        if ($builder = array_pull($parameters, 'builder')) {
-            try {
-                $builder = $container->make("anomaly.module.streams::{$namespace}.{$stream}.form");
-            } catch (\Exception $e) {
-                $builder = $this->dispatch(new GetDefaultFormBuilder($this->stream));
-            }
-        }
+        $builder = $this->dispatch(new GetDefaultFormBuilder($this->stream));
+
+        $hydrator->hydrate($builder, $parameters);
 
         return $builder;
     }

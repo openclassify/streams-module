@@ -51,7 +51,9 @@ class GetEntryFormBuilder
          * @var FormBuilder $builder
          */
         try {
-            $builder = $container->make("anomaly.module.streams::{$namespace}.{$stream}.form");
+            $builder = $container
+                ->make("anomaly.module.streams::{$namespace}.{$stream}.form")
+                ->setModel($this->stream->getEntryModel());
         } catch (\Exception $e) {
             if (!$builder = $this->dispatch(new GetConfiguredFormBuilder($this->stream))) {
                 $builder = $this->dispatch(new GetDefaultFormBuilder($this->stream));
