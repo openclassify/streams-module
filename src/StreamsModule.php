@@ -39,11 +39,12 @@ class StreamsModule extends Module
             ],
             'sections' => [
                 'assignments' => [
+                    'href' => 'admin/streams/assignments/{request.route.parameters.stream}',
+
                     'buttons' => [
                         'assign_fields' => [
                             'data-toggle' => 'modal',
                             'data-target' => '#modal',
-                            'enabled'     => 'admin/streams/assignments/*',
                             'href'        => 'admin/streams/assignments/{request.route.parameters.stream}/choose',
                         ],
                     ],
