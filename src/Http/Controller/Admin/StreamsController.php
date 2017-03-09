@@ -72,8 +72,8 @@ class StreamsController extends AdminController
     public function create(StreamFormBuilder $builder)
     {
         $builder->setOption('heading', 'module::admin/groups/heading');
+        $builder->setPrefix($this->getNamespace() . '_');
         $builder->setNamespace($this->getNamespace());
-        $builder->setPrefix('streams_');
 
         return $builder->render();
     }
@@ -88,8 +88,7 @@ class StreamsController extends AdminController
     public function edit(StreamFormBuilder $builder, $id)
     {
         $builder->setOption('heading', 'module::admin/groups/heading');
-        $builder->setPrefix('streams_');
-
+        
         return $builder->render($id);
     }
 
