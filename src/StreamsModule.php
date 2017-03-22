@@ -39,8 +39,8 @@ class StreamsModule extends Module
             ],
             'sections' => [
                 'assignments' => [
-                    'href' => 'admin/streams/assignments/{request.route.parameters.stream}',
-
+                    'hidden'  => true,
+                    'href'    => 'admin/streams/assignments/{request.route.parameters.stream}',
                     'buttons' => [
                         'assign_fields' => [
                             'data-toggle' => 'modal',
