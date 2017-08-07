@@ -81,7 +81,7 @@ class SetCheckNamespace
          */
         if ($request->path() == 'admin/streams/namespaces/create') {
 
-            $this->session->set('anomaly.module.streams::namespace', null);
+            $this->session->put('anomaly.module.streams::namespace', null);
 
             return $next($request);
         }
@@ -100,7 +100,7 @@ class SetCheckNamespace
          */
         if (!$namespace && $group) {
 
-            $this->session->set('anomaly.module.streams::namespace', $group->getSlug());
+            $this->session->put('anomaly.module.streams::namespace', $group->getSlug());
 
             return $this->redirect->to($request->path());
         }
@@ -135,7 +135,7 @@ class SetCheckNamespace
          */
         if ($namespace && $group && $request->has('namespace')) {
 
-            $this->session->set('anomaly.module.streams::namespace', $group->getSlug());
+            $this->session->put('anomaly.module.streams::namespace', $group->getSlug());
 
             return $this->redirect->to($request->path());
         }
