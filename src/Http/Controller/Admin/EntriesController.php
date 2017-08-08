@@ -50,7 +50,7 @@ class EntriesController extends AdminController
     public function index(StreamRepositoryInterface $streams)
     {
         /* @var StreamInterface $stream */
-        $stream = $streams->find($this->route->getParameter('stream'));
+        $stream = $streams->find($this->route->parameter('stream'));
 
         $builder = $this->dispatch(new GetEntryTableBuilder($stream));
 
@@ -92,7 +92,7 @@ class EntriesController extends AdminController
     public function create(StreamRepositoryInterface $streams)
     {
         /* @var StreamInterface $stream */
-        $stream = $streams->find($this->route->getParameter('stream'));
+        $stream = $streams->find($this->route->parameter('stream'));
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
@@ -108,11 +108,11 @@ class EntriesController extends AdminController
     public function edit(StreamRepositoryInterface $streams)
     {
         /* @var StreamInterface $stream */
-        $stream = $streams->find($this->route->getParameter('stream'));
+        $stream = $streams->find($this->route->parameter('stream'));
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
-        return $builder->render($this->route->getParameter('id'));
+        return $builder->render($this->route->parameter('id'));
     }
 
     /**
