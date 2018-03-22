@@ -6,6 +6,9 @@
 </div>
 
 <div class="modal-body">
+
+    {% include "streams::modals/filter" %}
+
     {% if not streams.isEmpty() %}
         <ul class="nav nav-pills nav-stacked">
             {% for stream in streams %}
