@@ -3,6 +3,7 @@
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
+use Anomaly\StreamsModule\Entry\Command\AddDefaultFormPermissions;
 use Anomaly\StreamsModule\Entry\Command\AddDefaultTablePermissions;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
@@ -85,13 +86,7 @@ class VirtualController extends AdminController
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
-        $builder->setOption(
-            'permission',
-            $builder->getOption(
-                'permission',
-                'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.write'
-            )
-        );
+        $this->dispatch(new AddDefaultFormPermissions($builder, $group, $stream));
 
         return $builder->render();
     }

@@ -4,6 +4,13 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 
+/**
+ * Class AddDefaultTablePermissions
+ *
+ * @link   http://pyrocms.com/
+ * @author PyroCMS, Inc. <support@pyrocms.com>
+ * @author Ryan Thompson <ryan@pyrocms.com>
+ */
 class AddDefaultTablePermissions
 {
 
