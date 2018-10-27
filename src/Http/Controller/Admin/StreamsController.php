@@ -2,7 +2,6 @@
 
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Form\StreamFormBuilder;
-use Anomaly\StreamsModule\Http\Middleware\AuthorizeNamespace;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
 use Anomaly\StreamsModule\Stream\Table\StreamTableBuilder;
 use Illuminate\Session\Store;
@@ -33,7 +32,6 @@ class StreamsController extends AdminController
     public function __construct(Store $session)
     {
         $this->middleware(SetCheckNamespace::class);
-        $this->middleware(AuthorizeNamespace::class);
 
         $this->namespace = $session->get('anomaly.module.streams::namespace');
 

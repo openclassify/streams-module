@@ -44,13 +44,6 @@ interface GroupInterface extends EntryInterface
     public function getDescription();
 
     /**
-     * Get the related allowed roles.
-     *
-     * @return RoleCollection
-     */
-    public function getAllowedRoles();
-
-    /**
      * Get the related streams.
      *
      * @return StreamCollection

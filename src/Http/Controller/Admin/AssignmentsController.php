@@ -1,6 +1,5 @@
 <?php namespace Anomaly\StreamsModule\Http\Controller\Admin;
 
-use Anomaly\StreamsModule\Http\Middleware\AuthorizeNamespace;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
 use Illuminate\Session\Store;
 
@@ -29,7 +28,6 @@ class AssignmentsController extends \Anomaly\Streams\Platform\Http\Controller\As
     public function __construct(Store $session)
     {
         $this->middleware(SetCheckNamespace::class);
-        $this->middleware(AuthorizeNamespace::class);
 
         $this->namespace = $session->get('anomaly.module.streams::namespace');
 

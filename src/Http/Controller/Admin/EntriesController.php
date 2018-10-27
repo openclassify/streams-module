@@ -5,7 +5,6 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
-use Anomaly\StreamsModule\Http\Middleware\AuthorizeNamespace;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
 use Illuminate\Session\Store;
 
@@ -34,7 +33,6 @@ class EntriesController extends AdminController
     public function __construct(Store $session)
     {
         $this->middleware(SetCheckNamespace::class);
-        $this->middleware(AuthorizeNamespace::class);
 
         $this->namespace = $session->get('anomaly.module.streams::namespace');
 

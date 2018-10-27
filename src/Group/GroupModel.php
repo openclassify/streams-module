@@ -58,16 +58,6 @@ class GroupModel extends StreamsUtilitiesGroupsEntryModel implements GroupInterf
     }
 
     /**
-     * Get the related allowed roles.
-     *
-     * @return RoleCollection
-     */
-    public function getAllowedRoles()
-    {
-        return $this->allowed_roles;
-    }
-
-    /**
      * Get the related streams.
      *
      * @return StreamCollection
