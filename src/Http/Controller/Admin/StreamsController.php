@@ -50,6 +50,7 @@ class StreamsController extends AdminController
     {
         $builder
             ->setActions(['prompt'])
+            ->setOption('sortable', true)
             ->setNamespace($this->getNamespace())
             ->setOption('heading', 'module::admin/groups/heading')
             ->setButtons(
