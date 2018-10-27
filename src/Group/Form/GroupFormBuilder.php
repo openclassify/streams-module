@@ -12,4 +12,31 @@ use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 class GroupFormBuilder extends FormBuilder
 {
 
+    /**
+     * The form sections.
+     *
+     * @var array
+     */
+    protected $sections = [
+        'group' => [
+            'tabs' => [
+                'general'        => [
+                    'title'  => 'anomaly.module.streams::tab.general',
+                    'fields' => [
+                        'name',
+                        'slug',
+                        'description',
+                        'allowed_roles',
+                    ],
+                ],
+                'virtualization' => [
+                    'title'  => 'anomaly.module.streams::tab.virtualization',
+                    'fields' => [
+                        'virtualize',
+                        'icon',
+                    ],
+                ],
+            ],
+        ],
+    ];
 }
