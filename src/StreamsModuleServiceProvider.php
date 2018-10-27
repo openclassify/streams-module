@@ -13,6 +13,7 @@ use Anomaly\StreamsModule\Group\GroupModel;
 use Anomaly\StreamsModule\Group\GroupRepository;
 use Anomaly\StreamsModule\Http\Controller\Admin\AssignmentsController;
 use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
@@ -138,5 +139,54 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
                 );
             }
         }
+    }
+
+    /**
+     * Boot the addon.
+     *
+     * @param GroupRepositoryInterface $groups
+     * @param Repository $config
+     */
+    public function boot(GroupRepositoryInterface $groups, Repository $config)
+    {
+
+        if (!$virtualized = $groups->virtualized()) {
+            return;
+        }
+
+        $permissions = $config->get('anomaly.module.users::config.permissions');
+
+        /* @var GroupInterface $group */
+        foreach ($virtualized as $group) {
+
+            $permissions['anomaly.module.' . $group->getSlug()]['title']       = $group->getName();
+            $permissions['anomaly.module.' . $group->getSlug()]['description'] = $group->getDescription();
+
+            foreach ($group->getStreams() as $stream) {
+
+                $config->set(
+                    'anomaly.module.' . $group->getSlug() . '::permissions.' . $stream->getSlug(),
+                    [
+                        'read',
+                        'write',
+                        'delete',
+                    ]
+                );
+
+                $permissions['anomaly.module.' . $group->getSlug()]['permissions'][$stream->getSlug()] = [
+                    'label'     => $stream->getName(),
+                    'available' => [
+                        'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug(
+                        ) . '.read'                                                                   => 'anomaly.module.streams::permission.entries.option.read',
+                        'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug(
+                        ) . '.write'                                                                  => 'anomaly.module.streams::permission.entries.option.write',
+                        'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug(
+                        ) . '.delete'                                                                 => 'anomaly.module.streams::permission.entries.option.delete',
+                    ],
+                ];
+            }
+        }
+
+        $config->set('anomaly.module.users::config.permissions', $permissions);
     }
 }

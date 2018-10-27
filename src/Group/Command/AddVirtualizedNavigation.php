@@ -50,6 +50,7 @@ class AddVirtualizedNavigation
                     'title'      => $group->getName(),
                     'slug'       => $group->getSlug(),
                     'href'       => 'admin/' . $group->getSlug(),
+                    'permission' => 'anomaly.module.' . $group->getSlug() . '::*',
                 ]
             );
         }

@@ -5,6 +5,7 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
+use Anomaly\UsersModule\Http\Middleware\AuthorizeModuleAccess;
 
 /**
  * Class VirtualController
@@ -15,6 +16,21 @@ use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
  */
 class VirtualController extends AdminController
 {
+
+    /**
+     * Create a new VirtualController instance.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        /**
+         * Disable the module authorization since
+         * these routes depend on the streams module
+         * which is not technically the behavior here.
+         */
+        $this->disableMiddleware(AuthorizeModuleAccess::class);
+    }
 
     /**
      * Return an index of existing entries.

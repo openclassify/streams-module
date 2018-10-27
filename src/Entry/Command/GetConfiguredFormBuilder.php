@@ -38,7 +38,7 @@ class GetConfiguredFormBuilder
     /**
      * Handle the command.
      *
-     * @param Hydrator   $hydrator
+     * @param Hydrator $hydrator
      * @param Repository $config
      * @return FormBuilder
      */
@@ -47,7 +47,7 @@ class GetConfiguredFormBuilder
         $stream    = $this->stream->getSlug();
         $namespace = $this->stream->getNamespace();
 
-        if (!$parameters = $config->get("anomaly.module.streams::form.{$namespace}.{$stream}")) {
+        if (!$parameters = $config->get("anomaly.module.streams::{$namespace}.{$stream}.form")) {
             return null;
         }
 

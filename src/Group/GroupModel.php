@@ -48,6 +48,16 @@ class GroupModel extends StreamsUtilitiesGroupsEntryModel implements GroupInterf
     }
 
     /**
+     * Get the description.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * Get the related allowed roles.
      *
      * @return RoleCollection

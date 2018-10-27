@@ -26,7 +26,6 @@ class GroupFormBuilder extends FormBuilder
                         'name',
                         'slug',
                         'description',
-                        'allowed_roles',
                     ],
                 ],
                 'virtualization' => [

@@ -37,6 +37,13 @@ interface GroupInterface extends EntryInterface
     public function getIcon();
 
     /**
+     * Get the description.
+     *
+     * @return string
+     */
+    public function getDescription();
+
+    /**
      * Get the related allowed roles.
      *
      * @return RoleCollection

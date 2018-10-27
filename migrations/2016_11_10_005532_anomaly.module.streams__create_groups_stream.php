@@ -47,7 +47,6 @@ class AnomalyModuleStreamsCreateGroupsStream extends Migration
         'description' => [
             'translatable' => true,
         ],
-        'allowed_roles',
     ];
 
 }

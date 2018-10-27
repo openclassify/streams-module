@@ -27,7 +27,8 @@
     },
     "require": {
         "anomaly/streams-platform": "^1.2",
-        "anomaly/icon-field_type": "^1.0"
+        "anomaly/icon-field_type": "^1.0",
+        "anomaly/users-module": "^2.4"
     },
     "autoload": {
         "psr-4": {

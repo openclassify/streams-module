@@ -47,7 +47,7 @@ class GetConfiguredTableBuilder
         $stream    = $this->stream->getSlug();
         $namespace = $this->stream->getNamespace();
 
-        if (!$parameters = $config->get("anomaly.module.streams::table.{$namespace}.{$stream}")) {
+        if (!$parameters = $config->get("anomaly.module.streams::{$namespace}.{$stream}.table")) {
             return null;
         }
 

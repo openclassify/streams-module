@@ -4,6 +4,7 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Ui\ControlPanel\ControlPanelBuilder;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Routing\Route;
 
 /**
@@ -86,15 +87,21 @@ class StreamsModuleSections
      * Handle the command.
      *
      * @param Route $route
+     * @param Repository $config
      * @param ControlPanelBuilder $builder
      * @param GroupRepositoryInterface $groups
      */
     public function handle(
         Route $route,
+        Repository $config,
         ControlPanelBuilder $builder,
         GroupRepositoryInterface $groups
     ) {
 
+        /**
+         * If we don't have a group present
+         * than we don't have anything to do.
+         */
         if (!$route->getAction('anomaly.module.streams::group.id')) {
 
             $builder->setSections($this->getDefault());
@@ -102,25 +109,54 @@ class StreamsModuleSections
             return;
         }
 
-        $builder->setSections([]);
-
-        /* @var GroupInterface $group */
+        /**
+         * Being that we have a group let's
+         * try and build up the sections.
+         *
+         * @var GroupInterface $group
+         */
         $group = $groups->find($route->getAction('anomaly.module.streams::group.id'));
 
-        $uri = 'admin/' . $group->getSlug();
+        /**
+         * If there is a CP configuration
+         * for sections then use those.
+         */
+        if ($sections = $config->get("anomaly.module.streams::{$group->getSlug()}.cp.sections")) {
 
-        /* @var StreamInterface $stream */
+            $builder->setSections($sections);
+
+            return;
+        }
+
+        /**
+         * Loop through each stream in the
+         * namespace and add a section for it.
+         *
+         * @var StreamInterface $stream
+         */
         foreach ($group->getStreams() as $k => $stream) {
 
-            $href = $uri . ($k == 0 ? '' : '/' . $stream->getSlug());
+            /**
+             * If we have a single configuration for the
+             * stream's section then use that and continue.
+             */
+            if ($section = $config->get("anomaly.module.streams::{$group->getSlug()}.{$stream->getSlug()}.section")) {
+
+                $builder->addSection($stream->getSlug(), $section);
+
+                continue;
+            }
+
+            $href = 'admin/' . $group->getSlug() . ($k == 0 ? '' : '/' . $stream->getSlug());
 
             $builder->addSection(
                 $stream->getSlug(),
                 [
-                    'title'   => $stream->getName(),
-                    'slug'    => $stream->getSlug(),
-                    'href'    => $href,
-                    'buttons' => [
+                    'href'        => $href,
+                    'title'       => $stream->getName(),
+                    'slug'        => $stream->getSlug(),
+                    'permissions' => 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.*',
+                    'buttons'     => [
                         'new_entry' => [
                             'href' => $href . '/create',
                         ],
