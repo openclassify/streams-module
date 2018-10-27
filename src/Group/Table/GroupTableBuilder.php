@@ -24,7 +24,6 @@ class GroupTableBuilder extends TableBuilder
                 'description',
             ],
         ],
-        'allowed_roles',
     ];
 
     /**
