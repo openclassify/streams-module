@@ -152,13 +152,15 @@ class StreamsModuleSections
             $builder->addSection(
                 $stream->getSlug(),
                 [
-                    'href'        => $href,
-                    'title'       => $stream->getName(),
-                    'slug'        => $stream->getSlug(),
-                    'permissions' => 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.*',
-                    'buttons'     => [
+                    'href'       => $href,
+                    'title'      => $stream->getName(),
+                    'slug'       => $stream->getSlug(),
+                    'permission' => 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.*',
+                    'buttons'    => [
                         'new_entry' => [
-                            'href' => $href . '/create',
+                            'href'       => $href . '/create',
+                            'permission' => 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug(
+                                ) . '.write',
                         ],
                     ],
                 ]

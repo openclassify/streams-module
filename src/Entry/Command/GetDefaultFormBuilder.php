@@ -38,6 +38,8 @@ class GetDefaultFormBuilder
      */
     public function handle(FormBuilder $builder)
     {
-        return $builder->setModel($this->stream->getEntryModel());
+        return $builder
+            ->setOption('is_default', true)
+            ->setModel($this->stream->getEntryModel());
     }
 }

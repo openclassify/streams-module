@@ -39,6 +39,7 @@ class GetDefaultTableBuilder
     public function handle(EntryTableBuilder $builder)
     {
         return $builder
+            ->setOption('is_default', true)
             ->setModel($this->stream->getEntryModel())
             ->setFilters(
                 [

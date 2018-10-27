@@ -3,8 +3,11 @@
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
+use Anomaly\StreamsModule\Entry\Command\AddDefaultTablePermissions;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
+use Anomaly\StreamsModule\Group\Contract\GroupInterface;
+use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\UsersModule\Http\Middleware\AuthorizeModuleAccess;
 
 /**
@@ -35,17 +38,27 @@ class VirtualController extends AdminController
     /**
      * Return an index of existing entries.
      *
+     * @param GroupRepositoryInterface $groups
      * @param  StreamRepositoryInterface $streams
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function index(StreamRepositoryInterface $streams)
-    {
+    public function index(
+        GroupRepositoryInterface $groups,
+        StreamRepositoryInterface $streams
+    ) {
+        /* @var GroupInterface $group */
+        if (!$group = $groups->find($this->route->getAction('anomaly.module.streams::group.id'))) {
+            abort(404);
+        }
+
         /* @var StreamInterface $stream */
         if (!$stream = $streams->find($this->route->getAction('anomaly.module.streams::stream.id'))) {
             abort(404);
         }
 
         $builder = $this->dispatch(new GetEntryTableBuilder($stream));
+
+        $this->dispatch(new AddDefaultTablePermissions($builder, $group, $stream));
 
         return $builder->render();
     }
@@ -56,14 +69,29 @@ class VirtualController extends AdminController
      * @param  StreamRepositoryInterface $streams
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function create(StreamRepositoryInterface $streams)
-    {
+    public function create(
+        GroupRepositoryInterface $groups,
+        StreamRepositoryInterface $streams
+    ) {
+        /* @var GroupInterface $group */
+        if (!$group = $groups->find($this->route->getAction('anomaly.module.streams::group.id'))) {
+            abort(404);
+        }
+
         /* @var StreamInterface $stream */
         if (!$stream = $streams->find($this->route->getAction('anomaly.module.streams::stream.id'))) {
             abort(404);
         }
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
+
+        $builder->setOption(
+            'permission',
+            $builder->getOption(
+                'permission',
+                'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.write'
+            )
+        );
 
         return $builder->render();
     }
@@ -71,17 +99,33 @@ class VirtualController extends AdminController
     /**
      * Edit an existing entry.
      *
+     * @param GroupRepositoryInterface $groups
      * @param  StreamRepositoryInterface $streams
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function edit(StreamRepositoryInterface $streams)
-    {
+    public function edit(
+        GroupRepositoryInterface $groups,
+        StreamRepositoryInterface $streams
+    ) {
+        /* @var GroupInterface $group */
+        if (!$group = $groups->find($this->route->getAction('anomaly.module.streams::group.id'))) {
+            abort(404);
+        }
+
         /* @var StreamInterface $stream */
         if (!$stream = $streams->find($this->route->getAction('anomaly.module.streams::stream.id'))) {
             abort(404);
         }
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
+
+        $builder->setOption(
+            'permission',
+            $builder->getOption(
+                'permission',
+                'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.write'
+            )
+        );
 
         return $builder->render($this->route->parameter('id'));
     }
