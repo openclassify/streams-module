@@ -4,11 +4,17 @@ use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
 use Anomaly\Streams\Platform\Assignment\AssignmentRouter;
 use Anomaly\Streams\Platform\Field\FieldRouter;
 use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel;
+use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
+use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Navigation\Event\GatherNavigation;
+use Anomaly\StreamsModule\Group\Command\AddVirtualizedNavigation;
+use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\StreamsModule\Group\GroupModel;
 use Anomaly\StreamsModule\Group\GroupRepository;
 use Anomaly\StreamsModule\Http\Controller\Admin\AssignmentsController;
 use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 
 /**
  * Class StreamsModuleServiceProvider
@@ -20,6 +26,17 @@ use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
  */
 class StreamsModuleServiceProvider extends AddonServiceProvider
 {
+
+    /**
+     * The addon listeners.
+     *
+     * @var array
+     */
+    protected $listeners = [
+        GatherNavigation::class => [
+            AddVirtualizedNavigation::class,
+        ],
+    ];
 
     /**
      * The addon routes.
@@ -61,12 +78,65 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
     /**
      * Map the addon.
      *
-     * @param FieldRouter      $fields
+     * @param Router $router
+     * @param Request $request
+     * @param FieldRouter $fields
      * @param AssignmentRouter $assignments
+     * @param GroupRepositoryInterface $groups
      */
-    public function map(FieldRouter $fields, AssignmentRouter $assignments)
-    {
+    public function map(
+        Router $router,
+        Request $request,
+        FieldRouter $fields,
+        AssignmentRouter $assignments,
+        GroupRepositoryInterface $groups
+    ) {
+
+        if (!$request->segment(1) == 'admin') {
+            return;
+        }
+
         $fields->route($this->addon, FieldsController::class);
         $assignments->route($this->addon, AssignmentsController::class);
+
+        /* @var GroupInterface $group */
+        foreach ($groups->virtualized() as $group) {
+
+            $uri = 'admin/' . $group->getSlug();
+
+            /* @var StreamInterface $stream */
+            foreach ($group->getStreams() as $k => $stream) {
+
+                $router->any(
+                    $uri . ($k == 0 ? '' : '/' . $stream->getSlug()),
+                    [
+                        'uses'                              => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@index',
+                        'streams::addon'                    => 'anomaly.module.streams',
+                        'anomaly.module.streams::stream.id' => $stream->getId(),
+                        'anomaly.module.streams::group.id'  => $group->getId(),
+                    ]
+                );
+
+                $router->any(
+                    $uri . ($k == 0 ? '' : '/' . $stream->getSlug()) . '/create',
+                    [
+                        'uses'                              => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@create',
+                        'streams::addon'                    => 'anomaly.module.streams',
+                        'anomaly.module.streams::stream.id' => $stream->getId(),
+                        'anomaly.module.streams::group.id'  => $group->getId(),
+                    ]
+                );
+
+                $router->any(
+                    $uri . ($k == 0 ? '' : '/' . $stream->getSlug()) . '/edit/{id}',
+                    [
+                        'uses'                              => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@edit',
+                        'streams::addon'                    => 'anomaly.module.streams',
+                        'anomaly.module.streams::stream.id' => $stream->getId(),
+                        'anomaly.module.streams::group.id'  => $group->getId(),
+                    ]
+                );
+            }
+        }
     }
 }

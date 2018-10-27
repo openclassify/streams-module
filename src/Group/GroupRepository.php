@@ -41,4 +41,15 @@ class GroupRepository extends EntryRepository implements GroupRepositoryInterfac
     {
         return $this->model->where('slug', $slug)->first();
     }
+
+    /**
+     * Return virtualized groups.
+     *
+     * @return GroupCollection
+     */
+    public function virtualized()
+    {
+        return $this->model->where('virtualize', true)->get();
+    }
+
 }

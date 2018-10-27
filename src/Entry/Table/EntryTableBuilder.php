@@ -19,7 +19,7 @@ class EntryTableBuilder extends TableBuilder
      */
     protected $buttons = [
         'edit' => [
-            'href' => 'admin/streams/entries/{request.route.parameters.stream}/edit/{entry.id}',
+            'href' => '/{request.path}/edit/{entry.id}',
         ],
     ];
 

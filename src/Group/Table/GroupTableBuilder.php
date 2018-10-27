@@ -35,6 +35,7 @@ class GroupTableBuilder extends TableBuilder
     protected $columns = [
         'name',
         'slug',
+        'entry.virtualize.label',
         'description',
     ];
 

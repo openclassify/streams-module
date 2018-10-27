@@ -1,8 +1,11 @@
 <?php namespace Anomaly\StreamsModule\Group;
 
 use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel;
+use Anomaly\Streams\Platform\Stream\StreamCollection;
+use Anomaly\Streams\Platform\Stream\StreamModel;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\UsersModule\Role\RoleCollection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class GroupModel
@@ -35,6 +38,16 @@ class GroupModel extends StreamsUtilitiesGroupsEntryModel implements GroupInterf
     }
 
     /**
+     * Get the icon.
+     *
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
      * Get the related allowed roles.
      *
      * @return RoleCollection
@@ -42,5 +55,25 @@ class GroupModel extends StreamsUtilitiesGroupsEntryModel implements GroupInterf
     public function getAllowedRoles()
     {
         return $this->allowed_roles;
+    }
+
+    /**
+     * Get the related streams.
+     *
+     * @return StreamCollection
+     */
+    public function getStreams()
+    {
+        return $this->streams;
+    }
+
+    /**
+     * Return the streams relation.
+     *
+     * @return HasMany
+     */
+    public function streams()
+    {
+        return $this->hasMany(StreamModel::class, 'namespace', 'slug');
     }
 }

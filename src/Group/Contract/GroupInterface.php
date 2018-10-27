@@ -1,7 +1,9 @@
 <?php namespace Anomaly\StreamsModule\Group\Contract;
 
 use Anomaly\Streams\Platform\Entry\Contract\EntryInterface;
+use Anomaly\Streams\Platform\Stream\StreamCollection;
 use Anomaly\UsersModule\Role\RoleCollection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Interface GroupInterface
@@ -28,9 +30,30 @@ interface GroupInterface extends EntryInterface
     public function getSlug();
 
     /**
+     * Get the icon.
+     *
+     * @return string
+     */
+    public function getIcon();
+
+    /**
      * Get the related allowed roles.
      *
      * @return RoleCollection
      */
     public function getAllowedRoles();
+
+    /**
+     * Get the related streams.
+     *
+     * @return StreamCollection
+     */
+    public function getStreams();
+
+    /**
+     * Return the streams relation.
+     *
+     * @return HasMany
+     */
+    public function streams();
 }
