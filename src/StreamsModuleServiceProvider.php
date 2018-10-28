@@ -79,10 +79,10 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
     /**
      * Map the addon.
      *
-     * @param Router $router
-     * @param Request $request
-     * @param FieldRouter $fields
-     * @param AssignmentRouter $assignments
+     * @param Router                   $router
+     * @param Request                  $request
+     * @param FieldRouter              $fields
+     * @param AssignmentRouter         $assignments
      * @param GroupRepositoryInterface $groups
      */
     public function map(
@@ -145,27 +145,27 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * Boot the addon.
      *
      * @param GroupRepositoryInterface $groups
-     * @param Repository $config
+     * @param Repository               $config
      */
     public function boot(GroupRepositoryInterface $groups, Repository $config)
     {
 
-        if (!$virtualized = $groups->virtualized()) {
-            return;
-        }
-
         $permissions = $config->get('anomaly.module.users::config.permissions');
 
         /* @var GroupInterface $group */
-        foreach ($virtualized as $group) {
+        foreach ($groups->all() as $group) {
 
-            $permissions['anomaly.module.' . $group->getSlug()]['title']       = $group->getName();
-            $permissions['anomaly.module.' . $group->getSlug()]['description'] = $group->getDescription();
+            if ($group->isVirtualized()) {
+                $permissions['anomaly.module.' . $group->getSlug()]['title']       = $group->getName();
+                $permissions['anomaly.module.' . $group->getSlug()]['description'] = $group->getDescription();
+            }
 
             foreach ($group->getStreams() as $stream) {
 
+                $namespace = 'anomaly.module.' . ($group->isVirtualized() ? $group->getSlug() : 'streams');
+
                 $config->set(
-                    'anomaly.module.' . $group->getSlug() . '::permissions.' . $stream->getSlug(),
+                    $namespace . '::permissions.' . $stream->getSlug(),
                     [
                         'read',
                         'write',
@@ -173,7 +173,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
                     ]
                 );
 
-                $permissions['anomaly.module.' . $group->getSlug()]['permissions'][$stream->getSlug()] = [
+                $permissions[$namespace]['permissions'][$stream->getSlug()] = [
                     'label'     => $stream->getName(),
                     'available' => [
                         'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug(

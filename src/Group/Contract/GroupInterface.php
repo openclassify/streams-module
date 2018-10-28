@@ -37,6 +37,13 @@ interface GroupInterface extends EntryInterface
     public function getIcon();
 
     /**
+     * Get the virtualized flag.
+     *
+     * @return bool
+     */
+    public function isVirtualized();
+
+    /**
      * Get the description.
      *
      * @return string

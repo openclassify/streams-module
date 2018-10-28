@@ -48,6 +48,16 @@ class GroupModel extends StreamsUtilitiesGroupsEntryModel implements GroupInterf
     }
 
     /**
+     * Get the virtualized flag.
+     *
+     * @return bool
+     */
+    public function isVirtualized()
+    {
+        return $this->virtualize;
+    }
+
+    /**
      * Get the description.
      *
      * @return string
