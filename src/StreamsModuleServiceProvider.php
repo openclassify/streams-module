@@ -160,9 +160,19 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
                 $permissions['anomaly.module.' . $group->getSlug()]['description'] = $group->getDescription();
             }
 
+            /* @var StreamInterface $stream */
             foreach ($group->getStreams() as $stream) {
 
                 $namespace = 'anomaly.module.' . ($group->isVirtualized() ? $group->getSlug() : 'streams');
+
+                $model = $stream->getEntryModel();
+
+                $model->bind(
+                    '__locate',
+                    function () use ($namespace) {
+                        return $namespace;
+                    }
+                );
 
                 $config->set(
                     $namespace . '::permissions.' . $stream->getSlug(),
