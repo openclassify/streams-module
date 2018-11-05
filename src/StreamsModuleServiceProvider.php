@@ -81,6 +81,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      *
      * @param Router                   $router
      * @param Request                  $request
+     * @param Repository               $config
      * @param FieldRouter              $fields
      * @param AssignmentRouter         $assignments
      * @param GroupRepositoryInterface $groups
@@ -88,6 +89,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
     public function map(
         Router $router,
         Request $request,
+        Repository $config,
         FieldRouter $fields,
         AssignmentRouter $assignments,
         GroupRepositoryInterface $groups
@@ -105,38 +107,40 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
 
             $uri = 'admin/' . $group->getSlug();
 
+            $namespace = $group->getSlug();
+
             /* @var StreamInterface $stream */
             foreach ($group->getStreams() as $k => $stream) {
 
-                $router->any(
-                    $uri . ($k == 0 ? '' : '/' . $stream->getSlug()),
-                    [
-                        'uses'                              => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@index',
-                        'streams::addon'                    => 'anomaly.module.streams',
-                        'anomaly.module.streams::stream.id' => $stream->getId(),
-                        'anomaly.module.streams::group.id'  => $group->getId(),
-                    ]
+                $slug = $stream->getSlug();
+
+                $defaults = [
+                    'streams::addon'                    => 'anomaly.module.streams',
+                    'anomaly.module.streams::stream.id' => $stream->getId(),
+                    'anomaly.module.streams::group.id'  => $group->getId(),
+                ];
+
+                $index = array_merge(
+                    ['uses' => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@index'],
+                    $config->get("anomaly.module.streams::{$namespace}.{$slug}.routes.index", []),
+                    $defaults
                 );
 
-                $router->any(
-                    $uri . ($k == 0 ? '' : '/' . $stream->getSlug()) . '/create',
-                    [
-                        'uses'                              => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@create',
-                        'streams::addon'                    => 'anomaly.module.streams',
-                        'anomaly.module.streams::stream.id' => $stream->getId(),
-                        'anomaly.module.streams::group.id'  => $group->getId(),
-                    ]
+                $create = array_merge(
+                    ['uses' => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@create'],
+                    $config->get("anomaly.module.streams::{$namespace}.{$slug}.routes.create", []),
+                    $defaults
                 );
 
-                $router->any(
-                    $uri . ($k == 0 ? '' : '/' . $stream->getSlug()) . '/edit/{id}',
-                    [
-                        'uses'                              => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@edit',
-                        'streams::addon'                    => 'anomaly.module.streams',
-                        'anomaly.module.streams::stream.id' => $stream->getId(),
-                        'anomaly.module.streams::group.id'  => $group->getId(),
-                    ]
+                $edit = array_merge(
+                    ['uses' => 'Anomaly\StreamsModule\Http\Controller\Admin\VirtualController@edit'],
+                    $config->get("anomaly.module.streams::{$namespace}.{$slug}.routes.edit", []),
+                    $defaults
                 );
+
+                $router->any($uri . ($k == 0 ? '' : '/' . $slug), $index);
+                $router->any($uri . ($k == 0 ? '' : '/' . $slug) . '/create', $create);
+                $router->any($uri . ($k == 0 ? '' : '/' . $slug) . '/edit/{id}', $edit);
             }
         }
     }
