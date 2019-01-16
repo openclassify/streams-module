@@ -1,4 +1,4 @@
-<?php namespace Anomaly\Streams\Platform\Model\Configuration\Command;
+<?php namespace Anomaly\StreamsModule\Configuration\Command;
 
 use Anomaly\StreamsModule\Configuration\Contract\ConfigurationInterface;
 use Anomaly\StreamsModule\Configuration\Contract\ConfigurationRepositoryInterface;
