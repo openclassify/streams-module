@@ -40,7 +40,7 @@ class AnomalyModuleStreamsCreateConfigurationsFields extends Migration
 
 {% block content %}
 
-	{% for entry in entries().get() %}
+	{% for entry in entries(stream.slug, stream.namespace).get() %}
 		<a href="{{ entry.route(\'view\') }}">{{ entry.title }}</a><br>
 	{% endfor %}
 
@@ -55,6 +55,8 @@ class AnomalyModuleStreamsCreateConfigurationsFields extends Migration
                 'default_value' => '{% extends "theme::layouts/default" %}
 
 {% block content %}
+
+    {% set entry = entries(stream.slug, stream.namespace).find(request_segments()|last) %}
 
 	<h1>{{ entry.title }}</h1>
 
