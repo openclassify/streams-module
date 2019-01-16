@@ -13,6 +13,18 @@ class GroupFormBuilder extends FormBuilder
 {
 
     /**
+     * The form fields.
+     *
+     * @var array
+     */
+    protected $fields = [
+        '*',
+        'slug' => [
+            'disabled' => 'edit',
+        ],
+    ];
+
+    /**
      * The form sections.
      *
      * @var array
