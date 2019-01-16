@@ -38,8 +38,22 @@ class GetDefaultFormBuilder
      */
     public function handle(FormBuilder $builder)
     {
-        return $builder
+        $builder
+            ->addButton('cancel')
             ->setOption('is_default', true)
             ->setModel($this->stream->getEntryModel());
+
+        if ($configuration = $this->stream->call('get_configuration')) {
+            $builder->addButton(
+                'view',
+                [
+                    'enabled' => 'edit',
+                    'target'  => '_blank',
+                    'href'    => '/{request.path}/../../view/{entry.id}',
+                ]
+            );
+        }
+
+        return $builder;
     }
 }
