@@ -3,15 +3,20 @@
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
 use Anomaly\Streams\Platform\Assignment\AssignmentRouter;
 use Anomaly\Streams\Platform\Field\FieldRouter;
-use Anomaly\StreamsModule\Configuration\Command\RouteConfigurations;
+use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesConfigurationsEntryModel;
+use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\StreamModel;
 use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Navigation\Event\GatherNavigation;
+use Anomaly\StreamsModule\Configuration\Command\RouteConfigurations;
 use Anomaly\StreamsModule\Configuration\ConfigurationModel;
+use Anomaly\StreamsModule\Configuration\ConfigurationRepository;
 use Anomaly\StreamsModule\Configuration\Contract\ConfigurationRepositoryInterface;
 use Anomaly\StreamsModule\Group\Command\AddVirtualizedNavigation;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
+use Anomaly\StreamsModule\Group\GroupModel;
+use Anomaly\StreamsModule\Group\GroupRepository;
 use Anomaly\StreamsModule\Http\Controller\Admin\AssignmentsController;
 use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
 use Anomaly\StreamsModule\Stream\StreamObserver;
@@ -65,8 +70,8 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $bindings = [
-        'Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel'         => 'Anomaly\StreamsModule\Group\GroupModel',
-        'Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesConfigurationsEntryModel' => 'Anomaly\StreamsModule\Configuration\ConfigurationModel',
+        StreamsUtilitiesGroupsEntryModel::class         => GroupModel::class,
+        StreamsUtilitiesConfigurationsEntryModel::class => ConfigurationModel::class,
     ];
 
     /**
@@ -75,8 +80,8 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $singletons = [
-        'Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface'                 => 'Anomaly\StreamsModule\Group\GroupRepository',
-        'Anomaly\StreamsModule\Configuration\Contract\ConfigurationRepositoryInterface' => 'Anomaly\StreamsModule\Configuration\ConfigurationRepository',
+        GroupRepositoryInterface::class         => GroupRepository::class,
+        ConfigurationRepositoryInterface::class => ConfigurationRepository::class,
     ];
 
     /**
