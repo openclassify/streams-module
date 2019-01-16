@@ -65,7 +65,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $bindings = [
-        'Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel'         => 'Anomaly\StreamsModule\Group\ConfigurationModel',
+        'Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel'         => 'Anomaly\StreamsModule\Group\GroupModel',
         'Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesConfigurationsEntryModel' => 'Anomaly\StreamsModule\Configuration\ConfigurationModel',
     ];
 
