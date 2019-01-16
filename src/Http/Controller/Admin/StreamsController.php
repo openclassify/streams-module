@@ -2,7 +2,10 @@
 
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Form\StreamFormBuilder;
+use Anomaly\StreamsModule\Configuration\Contract\ConfigurationRepositoryInterface;
+use Anomaly\StreamsModule\Configuration\Form\ConfigurationFormBuilder;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
+use Anomaly\StreamsModule\Stream\Form\StreamConfigurationFormBuilder;
 use Anomaly\StreamsModule\Stream\Table\StreamTableBuilder;
 use Illuminate\Session\Store;
 
@@ -65,14 +68,23 @@ class StreamsController extends AdminController
     /**
      * Create a new stream.
      *
-     * @param StreamFormBuilder $builder
+     * @param ConfigurationFormBuilder $configuration
+     * @param StreamConfigurationFormBuilder $builder
+     * @param StreamFormBuilder $stream
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function create(StreamFormBuilder $builder)
-    {
+    public function create(
+        ConfigurationFormBuilder $configuration,
+        StreamConfigurationFormBuilder $builder,
+        StreamFormBuilder $stream
+    ) {
         $builder->setOption('heading', 'module::admin/groups/heading');
-        $builder->setPrefix($this->getNamespace() . '_');
-        $builder->setNamespace($this->getNamespace());
+
+        $stream->setPrefix($this->getNamespace() . '_');
+        $stream->setNamespace($this->getNamespace());
+
+        $builder->addForm('stream', $stream);
+        $builder->addForm('configuration', $configuration);
 
         return $builder->render();
     }
@@ -84,11 +96,25 @@ class StreamsController extends AdminController
      * @param                   $id
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function edit(StreamFormBuilder $builder, $id)
+    public function edit(
+        ConfigurationRepositoryInterface $configurations,
+        ConfigurationFormBuilder $configuration,
+        StreamConfigurationFormBuilder $builder,
+        StreamFormBuilder $stream,
+        $id)
     {
         $builder->setOption('heading', 'module::admin/groups/heading');
-        
-        return $builder->render($id);
+
+        $stream->setEntry($id);
+
+        if ($entry = $configurations->findByRelatedId($id)) {
+            $configuration->setEntry($entry);
+        }
+
+        $builder->addForm('stream', $stream);
+        $builder->addForm('configuration', $configuration);
+
+        return $builder->render();
     }
 
     /**

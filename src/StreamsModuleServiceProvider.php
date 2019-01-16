@@ -3,9 +3,15 @@
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
 use Anomaly\Streams\Platform\Assignment\AssignmentRouter;
 use Anomaly\Streams\Platform\Field\FieldRouter;
+use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesConfigurationsEntryModel;
 use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
+use Anomaly\Streams\Platform\Stream\StreamModel;
 use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Navigation\Event\GatherNavigation;
+use Anomaly\StreamsModule\Configuration\ConfigurationModel;
+use Anomaly\StreamsModule\Configuration\ConfigurationRepository;
+use Anomaly\StreamsModule\Configuration\Contract\ConfigurationInterface;
+use Anomaly\StreamsModule\Configuration\Contract\ConfigurationRepositoryInterface;
 use Anomaly\StreamsModule\Group\Command\AddVirtualizedNavigation;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
@@ -13,8 +19,8 @@ use Anomaly\StreamsModule\Group\GroupModel;
 use Anomaly\StreamsModule\Group\GroupRepository;
 use Anomaly\StreamsModule\Http\Controller\Admin\AssignmentsController;
 use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
+use Anomaly\StreamsModule\Stream\StreamObserver;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 /**
@@ -64,7 +70,8 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $bindings = [
-        StreamsUtilitiesGroupsEntryModel::class => GroupModel::class,
+        StreamsUtilitiesGroupsEntryModel::class         => GroupModel::class,
+        StreamsUtilitiesConfigurationsEntryModel::class => ConfigurationModel::class,
     ];
 
     /**
@@ -73,34 +80,68 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $singletons = [
-        GroupRepositoryInterface::class => GroupRepository::class,
+        GroupRepositoryInterface::class         => GroupRepository::class,
+        ConfigurationRepositoryInterface::class => ConfigurationRepository::class,
     ];
+
+    /**
+     * Register the addon.
+     */
+    public function register()
+    {
+        StreamModel::observe(StreamObserver::class);
+    }
 
     /**
      * Map the addon.
      *
-     * @param Router                   $router
-     * @param Request                  $request
-     * @param Repository               $config
-     * @param FieldRouter              $fields
-     * @param AssignmentRouter         $assignments
+     * @param Router $router
+     * @param Repository $config
+     * @param FieldRouter $fields
+     * @param AssignmentRouter $assignments
      * @param GroupRepositoryInterface $groups
+     * @param ConfigurationRepositoryInterface $configurations
      */
     public function map(
         Router $router,
-        Request $request,
         Repository $config,
         FieldRouter $fields,
         AssignmentRouter $assignments,
-        GroupRepositoryInterface $groups
+        GroupRepositoryInterface $groups,
+        ConfigurationRepositoryInterface $configurations
     ) {
-
-        if (!$request->segment(1) == 'admin') {
-            return;
-        }
-
         $fields->route($this->addon, FieldsController::class);
         $assignments->route($this->addon, AssignmentsController::class);
+
+        /* @var ConfigurationInterface $configuration */
+        foreach ($configurations->routable() as $configuration) {
+
+            $stream = $configuration->getRelated();
+
+            $prefix = 'anomaly.module.' . $stream->getNamespace() . '::' . $stream->getSlug() . '.';
+
+            if ($route = $configuration->getIndexRoute()) {
+                $router->any(
+                    $route,
+                    [
+                        'uses'                                  => 'Anomaly\StreamsModule\Http\Controller\EntriesController@index',
+                        'anomaly.module.streams::configuration' => $configuration->getId(),
+                        'as'                                    => $prefix . 'index',
+                    ]
+                );
+            }
+
+            if ($route = $configuration->getViewRoute()) {
+                $router->any(
+                    $route,
+                    [
+                        'uses'                                  => 'Anomaly\StreamsModule\Http\Controller\EntriesController@view',
+                        'anomaly.module.streams::configuration' => $configuration->getId(),
+                        'as'                                    => $prefix . 'view',
+                    ]
+                );
+            }
+        }
 
         /* @var GroupInterface $group */
         foreach ($groups->virtualized() as $group) {
@@ -149,7 +190,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * Boot the addon.
      *
      * @param GroupRepositoryInterface $groups
-     * @param Repository               $config
+     * @param Repository $config
      */
     public function boot(GroupRepositoryInterface $groups, Repository $config)
     {

@@ -35,6 +35,15 @@ class GroupFormBuilder extends FormBuilder
                         'icon',
                     ],
                 ],
+                'routing'        => [
+                    'title'  => 'anomaly.module.streams::tab.routing',
+                    'fields' => [
+                        'index_route',
+                        'index_template',
+                        'view_route',
+                        'view_template',
+                    ],
+                ],
             ],
         ],
     ];
