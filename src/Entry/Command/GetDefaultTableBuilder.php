@@ -1,7 +1,7 @@
 <?php namespace Anomaly\StreamsModule\Entry\Command;
 
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
-use Anomaly\Streams\Platform\Traits\Hookable;
+use Anomaly\Streams\Platform\Stream\StreamModel;
 use Anomaly\StreamsModule\Entry\Table\EntryTableBuilder;
 
 /**
@@ -17,14 +17,14 @@ class GetDefaultTableBuilder
     /**
      * The stream instance.
      *
-     * @var StreamInterface|Hookable
+     * @var StreamInterface
      */
     protected $stream;
 
     /**
      * Create a new GetDefaultTableBuilder instance.
      *
-     * @param StreamInterface $stream
+     * @param StreamInterface|StreamModel $stream
      */
     public function __construct(StreamInterface $stream)
     {
@@ -39,17 +39,33 @@ class GetDefaultTableBuilder
      */
     public function handle(EntryTableBuilder $builder)
     {
+        $fields = $columns = array_slice($this->stream->getAssignmentFieldSlugs(), 0, 4);
+
+        $columns = array_combine($columns, $columns);
+
+        foreach ($columns as $field => &$column) {
+
+//            $type = $this->stream->getFieldType($field);
+//
+//            if (
+//                $type->hasHook('get_default_column_definition') &&
+//                $default = $type->call('get_default_column_definition')
+//            ) {
+//                $column = $default;
+//            }
+        }
+
         $builder
             ->setOption('is_default', true)
             ->setModel($this->stream->getEntryModel())
             ->setFilters(
                 [
                     'search' => [
-                        'fields' => array_slice($this->stream->getAssignmentFieldSlugs(), 0, 4),
+                        'fields' => $fields,
                     ],
                 ]
             )
-            ->setColumns(array_slice($this->stream->getAssignmentFieldSlugs(), 0, 4));
+            ->setColumns($columns);
 
         if ($configuration = $this->stream->call('get_configuration')) {
             $builder->addButton(
