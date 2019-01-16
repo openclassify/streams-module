@@ -26,10 +26,9 @@ use Illuminate\Routing\Router;
 /**
  * Class StreamsModuleServiceProvider
  *
- * @link          http://pyrocms.com/
- * @author        PyroCMS, Inc. <support@pyrocms.com>
- * @author        Ryan Thompson <ryan@pyrocms.com>
- * @package       Anomaly\StreamsModule
+ * @link   http://pyrocms.com/
+ * @author PyroCMS, Inc. <support@pyrocms.com>
+ * @author Ryan Thompson <ryan@pyrocms.com>
  */
 class StreamsModuleServiceProvider extends AddonServiceProvider
 {
@@ -58,6 +57,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
         'admin/streams/entries/{stream}'           => 'Anomaly\StreamsModule\Http\Controller\Admin\EntriesController@index',
         'admin/streams/entries/{stream}/create'    => 'Anomaly\StreamsModule\Http\Controller\Admin\EntriesController@create',
         'admin/streams/entries/{stream}/edit/{id}' => 'Anomaly\StreamsModule\Http\Controller\Admin\EntriesController@edit',
+        'admin/streams/entries/{stream}/view/{id}' => 'Anomaly\StreamsModule\Http\Controller\Admin\EntriesController@view',
         'admin/streams/namespaces'                 => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@index',
         'admin/streams/namespaces/create'          => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@create',
         'admin/streams/namespaces/change'          => 'Anomaly\StreamsModule\Http\Controller\Admin\GroupsController@change',
@@ -86,10 +86,28 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
 
     /**
      * Register the addon.
+     *
+     * @param StreamModel $model
      */
-    public function register()
+    public function register(StreamModel $model)
     {
         StreamModel::observe(StreamObserver::class);
+
+        $model->bind(
+            'configuration',
+            function () {
+                /* @var StreamModel $this */
+                return $this->hasOne(ConfigurationModel::class, 'related_id');
+            }
+        );
+
+        $model->bind(
+            'get_configuration',
+            function () {
+                /* @var StreamModel $this */
+                return $this->call('configuration')->getResults();
+            }
+        );
     }
 
     /**

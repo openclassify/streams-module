@@ -1,8 +1,11 @@
 <?php namespace Anomaly\StreamsModule\Http\Controller\Admin;
 
+use Anomaly\Streams\Platform\Entry\Contract\EntryInterface;
+use Anomaly\Streams\Platform\Entry\EntryRepository;
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
+use Anomaly\Streams\Platform\Stream\StreamModel;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
@@ -111,6 +114,26 @@ class EntriesController extends AdminController
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
         return $builder->render($this->route->parameter('id'));
+    }
+
+    /**
+     * View an existing entry in the stream.
+     *
+     * @param StreamRepositoryInterface $streams
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function view(StreamRepositoryInterface $streams, $stream, $id)
+    {
+        /* @var StreamModel $stream */
+        $stream = $streams->find($stream);
+
+        $entries = (new EntryRepository())->setModel($stream->getEntryModel());
+
+        /* @var EntryInterface $entry */
+        $entry = $entries->find($id);
+
+        return $this->redirect->to($entry->route('view'));
     }
 
     /**

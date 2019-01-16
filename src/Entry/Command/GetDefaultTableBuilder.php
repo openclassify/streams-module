@@ -1,6 +1,7 @@
 <?php namespace Anomaly\StreamsModule\Entry\Command;
 
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
+use Anomaly\Streams\Platform\Traits\Hookable;
 use Anomaly\StreamsModule\Entry\Table\EntryTableBuilder;
 
 /**
@@ -16,7 +17,7 @@ class GetDefaultTableBuilder
     /**
      * The stream instance.
      *
-     * @var StreamInterface
+     * @var StreamInterface|Hookable
      */
     protected $stream;
 
@@ -38,7 +39,7 @@ class GetDefaultTableBuilder
      */
     public function handle(EntryTableBuilder $builder)
     {
-        return $builder
+        $builder
             ->setOption('is_default', true)
             ->setModel($this->stream->getEntryModel())
             ->setFilters(
@@ -49,5 +50,17 @@ class GetDefaultTableBuilder
                 ]
             )
             ->setColumns(array_slice($this->stream->getAssignmentFieldSlugs(), 0, 4));
+
+        if ($configuration = $this->stream->call('get_configuration')) {
+            $builder->addButton(
+                'view',
+                [
+                    'target' => '_blank',
+                    'href'   => '/{request.path}/view/{entry.id}',
+                ]
+            );
+        }
+
+        return $builder;
     }
 }
