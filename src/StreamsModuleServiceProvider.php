@@ -88,17 +88,11 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      */
     public function map(
         Router $router,
-        Request $request,
         Repository $config,
         FieldRouter $fields,
         AssignmentRouter $assignments,
         GroupRepositoryInterface $groups
     ) {
-
-        if (!$request->segment(1) == 'admin') {
-            return;
-        }
-
         $fields->route($this->addon, FieldsController::class);
         $assignments->route($this->addon, AssignmentsController::class);
 
