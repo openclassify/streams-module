@@ -1,5 +1,6 @@
 <?php namespace Anomaly\StreamsModule\Group\Command;
 
+use Anomaly\Streams\Platform\Support\Authorizer;
 use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Navigation\Event\GatherNavigation;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
@@ -22,13 +23,22 @@ class AddVirtualizedNavigation
     protected $groups;
 
     /**
+     * The authorizer utility.
+     *
+     * @var Authorizer
+     */
+    protected $authorizer;
+
+    /**
      * Create a new AddVirtualizedNavigation instance.
      *
      * @param GroupRepositoryInterface $groups
+     * @param Authorizer $authorizer
      */
-    public function __construct(GroupRepositoryInterface $groups)
+    public function __construct(GroupRepositoryInterface $groups, Authorizer $authorizer)
     {
-        $this->groups = $groups;
+        $this->groups     = $groups;
+        $this->authorizer = $authorizer;
     }
 
     /**
@@ -41,7 +51,7 @@ class AddVirtualizedNavigation
         $builder = $event->getBuilder();
 
         /* @var GroupInterface $group */
-        foreach ($this->groups->virtualized() as $group) {
+        foreach ($this->groups->virtualized()->accessible() as $group) {
             $builder->addNavigation(
                 $group->getSlug(),
                 [
