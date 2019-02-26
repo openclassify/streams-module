@@ -1,4 +1,4 @@
-<?php namespace Anomaly\StreamsModule\Group\Command;
+<?php namespace Anomaly\StreamsModule\Group\Listener;
 
 use Anomaly\Streams\Platform\Support\Authorizer;
 use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Navigation\Event\GatherNavigation;
