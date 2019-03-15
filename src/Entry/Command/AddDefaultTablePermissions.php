@@ -77,33 +77,34 @@ class AddDefaultTablePermissions
         /**
          * Set the permissions for default buttons.
          */
-        $this->builder->setButtons(
-            [
-                'edit' => [
-                    'permission' => 'anomaly.module.' .
-                        $this->group->getSlug() . '::' .
-                        $this->stream->getSlug() . '.write',
-                ],
-            ]
-        );
+        $buttons = $this->builder->getButtons();
+
+        if (is_array($buttons) && isset($buttons['edit']) && !isset($buttons['edit']['permission'])) {
+            $buttons['edit']['permissions'] = 'anomaly.module.' .
+                $this->group->getSlug() . '::' .
+                $this->stream->getSlug() . '.write';
+        }
+
+        $this->builder->setButtons($buttons);
 
         /**
          * Set the permissions for default actions.
          */
-        $this->builder->setActions(
-            [
-                'delete' => [
-                    'permission' => 'anomaly.module.' .
-                        $this->group->getSlug() . '::' .
-                        $this->stream->getSlug() . '.delete',
-                ],
-                'edit'   => [
-                    'permission' => 'anomaly.module.' .
-                        $this->group->getSlug() . '::' .
-                        $this->stream->getSlug() . '.write',
-                ],
-            ]
-        );
+        $actions = $this->builder->getActions();
+
+        if (is_array($actions) && isset($actions['delete']) && !isset($actions['delete']['permission'])) {
+            $actions['edit']['permissions'] = 'anomaly.module.' .
+                $this->group->getSlug() . '::' .
+                $this->stream->getSlug() . '.delete';
+        }
+
+        if (is_array($actions) && isset($actions['delete']) && !isset($actions['delete']['permission'])) {
+            $actions['edit']['permissions'] = 'anomaly.module.' .
+                $this->group->getSlug() . '::' .
+                $this->stream->getSlug() . '.write';
+        }
+
+        $this->builder->setActions($actions);
     }
 
 }
