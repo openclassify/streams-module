@@ -38,6 +38,13 @@ class GetDefaultFormBuilder
      */
     public function handle(FormBuilder $builder)
     {
+        $stream    = $this->stream->getSlug();
+        $namespace = $this->stream->getNamespace();
+
+        if ($class = config("anomaly.module.streams::{$namespace}.{$stream}.form.builder")) {
+            $builder = app($class);
+        }
+        
         return $builder
             ->setOption('is_default', true)
             ->setModel($this->stream->getEntryModel());
