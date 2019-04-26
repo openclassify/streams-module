@@ -38,6 +38,13 @@ class GetDefaultTableBuilder
      */
     public function handle(EntryTableBuilder $builder)
     {
+        $stream    = $this->stream->getSlug();
+        $namespace = $this->stream->getNamespace();
+
+        if ($class = config("anomaly.module.streams::{$namespace}.{$stream}.table.builder")) {
+            $builder = app($class);
+        }
+        
         return $builder
             ->setOption('is_default', true)
             ->setModel($this->stream->getEntryModel())
