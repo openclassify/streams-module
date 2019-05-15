@@ -2,6 +2,7 @@
 
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Section\Event\GatherSections;
+use Anomaly\StreamsModule\Group\Command\GetGroup;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 
@@ -47,10 +48,8 @@ class AddVirtualizedSections
          *
          * @var GroupInterface $group
          */
-        if (!$group = $this->groups->find($id = request()->route()->getAction('anomaly.module.streams::group.id'))) {
-            throw new \Exception(
-                "Group [{$id}] cannot be determined from route action [anomaly.module.streams::group.id]."
-            );
+        if (!$group = dispatch_now(new GetGroup(request()->route()->getAction('anomaly.module.streams::group.id')))) {
+            return;
         }
 
         /**
