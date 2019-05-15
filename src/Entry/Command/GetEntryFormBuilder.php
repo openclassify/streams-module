@@ -64,7 +64,7 @@ class GetEntryFormBuilder
          * Add our default heading.
          */
         if (!$builder->getOption('heading')) {
-            $builder->setOption('heading', 'module::admin/groups/heading');
+            $builder->setOption('heading', 'anomaly.module.streams::admin/groups/heading');
         }
 
         return $builder;

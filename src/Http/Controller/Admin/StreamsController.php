@@ -50,7 +50,7 @@ class StreamsController extends AdminController
             ->setActions(['prompt'])
             ->setOption('sortable', true)
             ->setNamespace($this->getNamespace())
-            ->setOption('heading', 'module::admin/groups/heading')
+            ->setOption('heading', 'anomaly.module.streams::admin/groups/heading')
             ->setButtons(
                 [
                     'entries',
@@ -70,7 +70,7 @@ class StreamsController extends AdminController
      */
     public function create(StreamFormBuilder $builder)
     {
-        $builder->setOption('heading', 'module::admin/groups/heading');
+        $builder->setOption('heading', 'anomaly.module.streams::admin/groups/heading');
         $builder->setPrefix($this->getNamespace() . '_');
         $builder->setNamespace($this->getNamespace());
 
@@ -86,7 +86,7 @@ class StreamsController extends AdminController
      */
     public function edit(StreamFormBuilder $builder, $id)
     {
-        $builder->setOption('heading', 'module::admin/groups/heading');
+        $builder->setOption('heading', 'anomaly.module.streams::admin/groups/heading');
         
         return $builder->render($id);
     }

@@ -7,12 +7,14 @@ use Anomaly\Streams\Platform\Field\FieldRouter;
 use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel;
 use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Navigation\Event\GatherNavigation;
-use Anomaly\StreamsModule\Group\Listener\AddVirtualizedNavigation;
-use Anomaly\StreamsModule\Group\Listener\LocateVirtualizedModels;
+use Anomaly\Streams\Platform\Ui\ControlPanel\Component\Section\Event\GatherSections;
 use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\StreamsModule\Group\GroupModel;
 use Anomaly\StreamsModule\Group\GroupRepository;
+use Anomaly\StreamsModule\Group\Listener\AddVirtualizedNavigation;
+use Anomaly\StreamsModule\Group\Listener\AddVirtualizedSections;
+use Anomaly\StreamsModule\Group\Listener\LocateVirtualizedModels;
 use Anomaly\StreamsModule\Http\Controller\Admin\AssignmentsController;
 use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
 use Illuminate\Contracts\Config\Repository;
@@ -36,7 +38,10 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * @var array
      */
     protected $listeners = [
-        GatherNavigation::class => [
+        GatherSections::class       => [
+            AddVirtualizedSections::class,
+        ],
+        GatherNavigation::class     => [
             AddVirtualizedNavigation::class,
         ],
         AddonsHaveRegistered::class => [
@@ -84,11 +89,11 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
     /**
      * Map the addon.
      *
-     * @param Router                   $router
-     * @param Request                  $request
-     * @param Repository               $config
-     * @param FieldRouter              $fields
-     * @param AssignmentRouter         $assignments
+     * @param Router $router
+     * @param Request $request
+     * @param Repository $config
+     * @param FieldRouter $fields
+     * @param AssignmentRouter $assignments
      * @param GroupRepositoryInterface $groups
      */
     public function map(
@@ -114,7 +119,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
                 $slug = $stream->getSlug();
 
                 $defaults = [
-                    'streams::addon'                    => 'anomaly.module.streams',
+                    'streams::addon'                    => 'anomaly.module.' . $namespace,
                     'anomaly.module.streams::stream.id' => $stream->getId(),
                     'anomaly.module.streams::group.id'  => $group->getId(),
                 ];
@@ -148,7 +153,7 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * Boot the addon.
      *
      * @param GroupRepositoryInterface $groups
-     * @param Repository               $config
+     * @param Repository $config
      */
     public function boot(GroupRepositoryInterface $groups, Repository $config)
     {

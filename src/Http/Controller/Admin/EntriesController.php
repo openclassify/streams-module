@@ -74,7 +74,7 @@ class EntriesController extends AdminController
         }
 
         return $this->view->make(
-            'module::admin/entries/choose',
+            'anomaly.module.streams::admin/entries/choose',
             [
                 'streams' => $streams,
             ]
