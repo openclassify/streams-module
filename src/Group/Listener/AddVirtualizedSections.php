@@ -92,7 +92,7 @@ class AddVirtualizedSections
                     'slug'       => $stream->getSlug(),
                     'permission' => 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.*',
                     'buttons'    => [
-                        'new_entry' => [
+                        'new' => [
                             'href'       => $href . '/create',
                             'permission' => 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug(
                                 ) . '.write',
