@@ -1,7 +1,9 @@
 <?php namespace Anomaly\StreamsModule;
 
+use Anomaly\Streams\Platform\Addon\AddonCollection;
 use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
 use Anomaly\Streams\Platform\Addon\Event\AddonsHaveRegistered;
+use Anomaly\Streams\Platform\Addon\Module\Module;
 use Anomaly\Streams\Platform\Assignment\AssignmentRouter;
 use Anomaly\Streams\Platform\Field\FieldRouter;
 use Anomaly\Streams\Platform\Model\StreamsUtilities\StreamsUtilitiesGroupsEntryModel;
@@ -18,7 +20,6 @@ use Anomaly\StreamsModule\Group\Listener\LocateVirtualizedModels;
 use Anomaly\StreamsModule\Http\Controller\Admin\AssignmentsController;
 use Anomaly\StreamsModule\Http\Controller\Admin\FieldsController;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 /**
@@ -90,16 +91,18 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
      * Map the addon.
      *
      * @param Router $router
-     * @param Request $request
      * @param Repository $config
      * @param FieldRouter $fields
+     * @param AddonCollection $addons
      * @param AssignmentRouter $assignments
      * @param GroupRepositoryInterface $groups
+     * @internal param Request $request
      */
     public function map(
         Router $router,
         Repository $config,
         FieldRouter $fields,
+        AddonCollection $addons,
         AssignmentRouter $assignments,
         GroupRepositoryInterface $groups
     ) {
@@ -146,7 +149,17 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
                 $router->any($uri . ($k == 0 ? '' : '/' . $slug) . '/create', $create);
                 $router->any($uri . ($k == 0 ? '' : '/' . $slug) . '/edit/{id}', $edit);
             }
+
+            $addons->put(
+                'anomaly.module.' . $namespace,
+                (new Module())
+                    ->setType('module')
+                    ->setVendor('anomaly')
+                    ->setSlug($namespace)
+            );
         }
+
+        $addons->disperse();
     }
 
     /**
