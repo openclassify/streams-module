@@ -154,8 +154,10 @@ class StreamsModuleServiceProvider extends AddonServiceProvider
                 'anomaly.module.' . $namespace,
                 (new Module())
                     ->setType('module')
-                    ->setVendor('anomaly')
                     ->setSlug($namespace)
+                    ->setVendor('anomaly')
+                    ->setDescription($group->getDescription())
+                    ->setName($group->getName() . ' ' . trans('streams::addon.module'))
             );
         }
 
