@@ -1,29 +1,23 @@
-{% set namespace = entries('streams_utilities', 'groups').findBySlug(session_get('anomaly.module.streams::namespace')) %}
+{% set group = table.data.group ?: form.data.group %}
+{% set stream = table.model.stream ?: form.model.stream %}
 
-{% if namespace %}
+{% if group.slug %}
     <div class="card">
         <div class="card-block">
             <h4 class="card-title">
 
-                {{ namespace.name }}
+                {{ group.name }}
 
-                {% if table.model.stream.name %}
-                    <i class="fa fa-long-arrow-right small"></i> {{ table.model.stream.name }}
+                {% if stream.name %}
+                    <i class="fa fa-long-arrow-right small"></i> {{ stream.name }}
                 {% endif %}
 
-                {% if form.model.stream.name %}
-                    <i class="fa fa-long-arrow-right small"></i> {{ form.model.stream.name }}
-                {% endif %}
-
-                {% if table.model.stream.description %}
+                {% if stream.description %}
                     <br>
-                    <small class="text-muted">{{ table.model.stream.description }}</small>
-                {% elseif form.model.stream.description %}
+                    <small class="text-muted">{{ stream.description }}</small>
+                {% elseif group.description %}
                     <br>
-                    <small class="text-muted">{{ form.model.stream.description }}</small>
-                {% elseif namespace.description.value %}
-                    <br>
-                    <small class="text-muted">{{ namespace.description }}</small>
+                    <small class="text-muted">{{ group.description }}</small>
                 {% endif %}
 
             </h4>

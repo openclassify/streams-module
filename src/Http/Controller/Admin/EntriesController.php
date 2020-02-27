@@ -5,6 +5,7 @@ use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
+use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\StreamsModule\Http\Middleware\SetCheckNamespace;
 use Illuminate\Session\Store;
 
@@ -43,14 +44,17 @@ class EntriesController extends AdminController
      * Return an index of existing entries.
      *
      * @param  StreamRepositoryInterface $streams
+     * @param  GroupRepositoryInterface $groups
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function index(StreamRepositoryInterface $streams)
+    public function index(StreamRepositoryInterface $streams, GroupRepositoryInterface $groups)
     {
         /* @var StreamInterface $stream */
         $stream = $streams->find($this->route->parameter('stream'));
 
         $builder = $this->dispatch(new GetEntryTableBuilder($stream));
+
+        $builder->addTableData('group', $groups->findBySlug($this->namespace));
 
         return $builder->render();
     }
@@ -85,14 +89,17 @@ class EntriesController extends AdminController
      * Create a new entry.
      *
      * @param  StreamRepositoryInterface $streams
+     * @param  GroupRepositoryInterface $groups
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function create(StreamRepositoryInterface $streams)
+    public function create(StreamRepositoryInterface $streams, GroupRepositoryInterface $groups)
     {
         /* @var StreamInterface $stream */
         $stream = $streams->find($this->route->parameter('stream'));
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
+
+        $builder->addFormData('group', $groups->findBySlug($this->namespace));
 
         return $builder->render();
     }
@@ -101,14 +108,17 @@ class EntriesController extends AdminController
      * Edit an existing entry.
      *
      * @param  StreamRepositoryInterface $streams
+     * @param  GroupRepositoryInterface $groups
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function edit(StreamRepositoryInterface $streams)
+    public function edit(StreamRepositoryInterface $streams, GroupRepositoryInterface $groups)
     {
         /* @var StreamInterface $stream */
         $stream = $streams->find($this->route->parameter('stream'));
 
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
+
+        $builder->addFormData('group', $groups->findBySlug($this->namespace));
 
         return $builder->render($this->route->parameter('id'));
     }

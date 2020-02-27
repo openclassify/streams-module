@@ -1,13 +1,11 @@
 <?php namespace Anomaly\StreamsModule\Http\Controller\Admin;
 
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
-use Anomaly\Streams\Platform\Stream\Contract\StreamInterface;
 use Anomaly\Streams\Platform\Stream\Contract\StreamRepositoryInterface;
 use Anomaly\StreamsModule\Entry\Command\AddDefaultFormPermissions;
 use Anomaly\StreamsModule\Entry\Command\AddDefaultTablePermissions;
 use Anomaly\StreamsModule\Entry\Command\GetEntryFormBuilder;
 use Anomaly\StreamsModule\Entry\Command\GetEntryTableBuilder;
-use Anomaly\StreamsModule\Group\Contract\GroupInterface;
 use Anomaly\StreamsModule\Group\Contract\GroupRepositoryInterface;
 use Anomaly\UsersModule\Http\Middleware\AuthorizeModuleAccess;
 
@@ -61,6 +59,8 @@ class VirtualController extends AdminController
 
         $this->dispatch(new AddDefaultTablePermissions($builder, $group, $stream));
 
+        $builder->addTableData('group', $group);
+        
         return $builder->render();
     }
 
@@ -87,6 +87,8 @@ class VirtualController extends AdminController
         $builder = $this->dispatch(new GetEntryFormBuilder($stream));
 
         $this->dispatch(new AddDefaultFormPermissions($builder, $group, $stream));
+
+        $builder->addFormData('group', $group);
 
         return $builder->render();
     }
@@ -121,6 +123,8 @@ class VirtualController extends AdminController
                 'anomaly.module.' . $group->getSlug() . '::' . $stream->getSlug() . '.write'
             )
         );
+
+        $builder->addFormData('group', $group);
 
         return $builder->render($this->route->parameter('id'));
     }
