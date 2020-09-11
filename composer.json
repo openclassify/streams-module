@@ -8,7 +8,7 @@
         "streams"
     ],
     "homepage": "http://pyrocms.com/addons/anomaly/streams-module",
-    "license": "https://pyrocms.com/pro/license",
+    "license": "MIT",
     "authors": [
         {
             "name": "PyroCMS, Inc.",
