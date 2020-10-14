@@ -31,11 +31,11 @@ class EntriesController extends AdminController
      *
      * @param Store $session
      */
-    public function __construct(Store $session)
+    public function __construct()
     {
         $this->middleware(SetCheckNamespace::class);
 
-        $this->namespace = $session->get('anomaly.module.streams::namespace');
+        $this->namespace = app(Store::class)->get('anomaly.module.streams::namespace');
 
         parent::__construct();
     }
