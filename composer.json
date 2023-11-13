@@ -1,5 +1,5 @@
 {
-    "name": "anomaly/streams-module",
+    "name": "visiosoft/streams-module",
     "type": "streams-addon",
     "description": "Build custom streams in the control panel.",
     "keywords": [
